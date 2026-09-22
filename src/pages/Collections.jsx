@@ -6,7 +6,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 /** Collections index shell. One named drop exists so far; the editorial pages arrive with the content. */
 export default function Collections() {
-  useDocumentTitle('Collections');
+  useDocumentTitle('Collections', 'Sanovia Essentials collections — small, considered drops of watches and jewellery.');
   return (
     <>
       <PageHead overline="Sanovia" title="Collections" />

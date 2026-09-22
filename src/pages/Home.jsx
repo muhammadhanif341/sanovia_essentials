@@ -37,7 +37,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 export default function Home() {
   const ref = useRef(null);
   usePageMotion(ref);
-  useDocumentTitle('');
+  useDocumentTitle('', 'Sanovia Essentials — minimal everyday watches and jewellery. Order on WhatsApp; no account needed.');
 
   return (
     <div ref={ref}>

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Section } from '@/components/layout/primitives';
 import { PageHead } from '@/components/layout/PageHead';
@@ -20,6 +20,7 @@ import { getProduct, getRelatedProducts, availabilityMeta } from '@/data/product
 import { whatsappLink } from '@/utils/whatsapp';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePageMotion } from '@/hooks/useSectionMotion';
+import { setProductSchema } from '@/utils/seo';
 
 const CATEGORY_LABEL = { watches: 'Watches', jewellery: 'Jewellery' };
 
@@ -27,7 +28,16 @@ const CATEGORY_LABEL = { watches: 'Watches', jewellery: 'Jewellery' };
 export default function Product() {
   const { slug } = useParams();
   const product = getProduct(slug);
-  useDocumentTitle(product?.name ?? 'Piece not found');
+  useDocumentTitle(product?.name ?? 'Piece not found', product?.description);
+
+  // Product JSON-LD (utils/seo.js) — architecture only today: the catalogue is empty until the
+  // client supplies real pieces (data/products.js), so this is a no-op in production for now and
+  // activates the moment real data lands. Runs outside useDocumentTitle's effect since it depends
+  // on the whole product object, not just name/description, and must clear on a not-found page.
+  useEffect(() => {
+    setProductSchema(product);
+    return () => setProductSchema(null);
+  }, [product]);
 
   return product ? <ProductDetail product={product} /> : <ProductNotFound slug={slug} />;
 }
