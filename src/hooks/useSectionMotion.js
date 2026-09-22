@@ -5,7 +5,7 @@
  *   const ref = useRef(null);
  *   usePageMotion(ref);          // data-reveal + data-parallax inside `ref`
  */
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useMotion } from './useMotion';
 import {
   initReveals,
@@ -19,8 +19,10 @@ import {
   cursorFollow,
   horizontalScroll,
   stickyStage,
+  initFrameSequence,
 } from '@/animations';
 import { refreshAfterImages } from '@/animations/refresh';
+import { getFrameSequence } from '@/utils/media';
 
 const parallaxIntensity = () => (window.innerWidth < 768 ? 0.4 : window.innerWidth < 1024 ? 0.6 : 1);
 
@@ -51,7 +53,11 @@ export function useHeroIntro(scope, { exit = false, onCovered } = {}) {
   useMotion(
     ({ reduce, fine, scope: root }) => {
       if (!root) return undefined;
-      const next = exit ? root.nextElementSibling : null;
+      // Skip the frame sequence's inert `.sv-hero__runway` spacer (hero.css), if present, to
+      // find the real next section — the runway is a sibling purely for scroll distance, not
+      // something the hand-off should ever target.
+      let next = exit ? root.nextElementSibling : null;
+      while (next?.hasAttribute('data-hero-runway')) next = next.nextElementSibling;
       const notify = (covered) => coveredRef.current?.(covered);
       if (reduce) {
         heroCoverWatch(next, notify);
@@ -65,6 +71,57 @@ export function useHeroIntro(scope, { exit = false, onCovered } = {}) {
     },
     { scope }
   );
+}
+
+/**
+ * The hero's scroll-scrubbed frame sequence (client-directed — see
+ * animations/primitives/frameSequence.js). This is the product animation itself, not
+ * decorative chrome, so — unlike every other motion primitive in this file — it is NOT gated
+ * on `prefers-reduced-motion` or Save-Data: the client's explicit, repeated brief is that the
+ * hero must always be the real scroll-driven sequence, never a static fallback image, full
+ * stop. (`active` still requires the frames to actually exist — `urls.length > 1` — so a
+ * missing/incomplete asset drop still degrades to the Picture fallback below rather than an
+ * empty canvas; that's an asset-availability guard, not a motion-preference one.)
+ *
+ * There is still no pause control, and this isn't a WCAG 2.2.2 gap: the sequence only ever
+ * moves 1:1 with the user's own scroll position (never a timer), so stopping IS the pause —
+ * same reasoning already applied to <StickyStage/> elsewhere in this codebase.
+ *
+ * `root.dataset.heroFrames = 'active'` is a plain marker (not read by CSS for layout any more —
+ * see hero.css's architecture note on why the scroll runway is a sibling, not a height hack)
+ * kept for anything that wants to key off "the real sequence is running" (e.g. debugging).
+ *
+ * @param {object} [o]
+ * @param {string} [o.id]        frame sequence id → src/assets/video/<id>/frames/*
+ * @param {string} [o.stillId]   Picture id shown instead, ONLY if no frames are registered
+ * @returns {{ wrapperRef: React.RefObject, canvasRef: React.RefObject, runwayRef: React.RefObject, active: boolean, stillId: string }}
+ *   `wrapperRef` → the sticky `<section>` (also what `useHeroIntro` should scope to)
+ *   `runwayRef`  → the inert scroll-runway spacer rendered right after the `<section>`
+ */
+export function useHeroFrames({ id = 'hero', stillId = 'editorial/hero-hold' } = {}) {
+  const wrapperRef = useRef(null);
+  const canvasRef = useRef(null);
+  const runwayRef = useRef(null);
+  const urls = useMemo(() => getFrameSequence(id), [id]);
+  const active = urls.length > 1;
+
+  useMotion(
+    ({ scope: root }) => {
+      if (!active || !root) return undefined;
+      const canvas = canvasRef.current;
+      const runway = runwayRef.current;
+      if (!canvas || !runway) return undefined;
+      root.dataset.heroFrames = 'active';
+      const teardown = initFrameSequence(root, canvas, runway, urls);
+      return () => {
+        teardown();
+        delete root.dataset.heroFrames;
+      };
+    },
+    { scope: wrapperRef, deps: [active, urls] }
+  );
+
+  return { wrapperRef, canvasRef, runwayRef, active, stillId };
 }
 
 /** Magnetic pull on a single element (primary CTAs only). Fine pointer only, motion allowed. */

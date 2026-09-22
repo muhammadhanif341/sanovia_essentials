@@ -11,6 +11,7 @@ export {
   initReveals,
 } from './primitives/reveal';
 export { initParallax, initScaleParallax } from './primitives/parallax';
+export { initFrameSequence } from './primitives/frameSequence';
 export { magnetic, lampGlow, cursorFollow } from './primitives/pointer';
 export { horizontalScroll, stickyStage } from './primitives/scrollStages';
 export { heroIntro, heroExit, heroCoverWatch } from './hero';
