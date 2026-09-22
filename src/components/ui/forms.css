@@ -1,0 +1,148 @@
+/* Forms: visible label above every field (never placeholder-only), hint + error
+   wired with aria-describedby, 48px controls (52px on touch), hairline borders that
+   pass 3:1 non-text contrast on every surface (enforced by check:contrast). */
+
+.sv-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.sv-field__label {
+  color: var(--fg);
+}
+.sv-field__label-req {
+  color: var(--accent);
+}
+
+.sv-input,
+.sv-textarea,
+.sv-select__control {
+  width: 100%;
+  min-height: var(--control-h);
+  padding: 0.75rem 1rem;
+  background: var(--field-bg);
+  color: var(--fg);
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-none);
+  font: 400 1rem / 1.4 var(--font-body); /* 16px: also prevents iOS focus-zoom */
+  transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+}
+.sv-textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+.sv-input::placeholder,
+.sv-textarea::placeholder {
+  color: var(--fg-muted);
+  opacity: 0.85;
+}
+@media (hover: hover) {
+  .sv-input:hover,
+  .sv-textarea:hover,
+  .sv-select__control:hover {
+    border-color: var(--accent);
+  }
+}
+.sv-input:focus-visible,
+.sv-textarea:focus-visible,
+.sv-select__control:focus-visible {
+  border-color: var(--focus);
+}
+.sv-input:disabled,
+.sv-textarea:disabled,
+.sv-select__control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sv-field--error .sv-input,
+.sv-field--error .sv-textarea,
+.sv-field--error .sv-select__control {
+  border-color: var(--danger);
+}
+.sv-field__hint {
+  color: var(--fg-muted);
+}
+.sv-field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--danger); /* icon + text: never colour alone */
+}
+.sv-field__error svg {
+  flex: none;
+  margin-top: 0.2em;
+}
+
+/* Select: native control (best a11y + mobile pickers), custom chevron. */
+.sv-select {
+  position: relative;
+}
+.sv-select__control {
+  appearance: none;
+  padding-right: 3rem;
+  cursor: pointer;
+}
+.sv-select::after {
+  content: '';
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 1.5px solid var(--fg);
+  border-bottom: 1.5px solid var(--fg);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+.sv-select__control option {
+  color: var(--ink);
+  background: var(--ivory-50);
+}
+
+/* Checkbox: custom box on a real <input type=checkbox>. */
+.sv-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: 44px;
+  cursor: pointer;
+}
+.sv-check__input {
+  appearance: none;
+  flex: none;
+  display: grid;
+  place-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.1rem;
+  border: 1px solid var(--field-border);
+  border-radius: 2px;
+  background: var(--field-bg);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.sv-check__input::before {
+  content: '';
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--btn-fg);
+  clip-path: polygon(14% 52%, 0 66%, 38% 100%, 100% 22%, 86% 8%, 38% 72%);
+  transform: scale(0);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.sv-check__input:checked {
+  background: var(--btn-bg);
+  border-color: var(--btn-bg);
+}
+.sv-check__input:checked::before {
+  transform: scale(1);
+}
+.sv-check__text {
+  padding-top: 0.15rem;
+}
+@media (forced-colors: active) {
+  .sv-check__input:checked {
+    background: Highlight;
+  }
+}

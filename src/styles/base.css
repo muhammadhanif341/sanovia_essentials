@@ -1,0 +1,116 @@
+/* Document-level defaults, focus system, skip link, screen-reader utilities. */
+
+html {
+  background: var(--espresso-900);
+  scrollbar-gutter: stable; /* scroll-lock never shifts the layout */
+  scroll-padding-top: calc(var(--header-h) + var(--space-4)); /* WCAG 2.4.11: sticky header never hides focus */
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+html[data-scroll-locked] {
+  overflow: hidden;
+}
+
+body {
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: var(--leading-body);
+}
+
+/* Semantic headings get sensible defaults; .t-* classes override them. */
+h1 {
+  font: 500 var(--text-h1) / var(--leading-heading) var(--font-display);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+h2 {
+  font: 500 var(--text-h2) / 1.1 var(--font-display);
+  text-wrap: balance;
+}
+h3 {
+  font: 500 var(--text-h3) / 1.2 var(--font-display);
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+strong {
+  font-weight: 500;
+}
+em {
+  font-style: italic;
+}
+hr {
+  border: 0;
+  border-top: var(--hairline-w) solid var(--hairline);
+}
+::selection {
+  background: var(--champagne-400);
+  color: var(--espresso-900);
+}
+
+/* ---- Focus ------------------------------------------------------------ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+:where(a, button, input, select, textarea, summary, [tabindex]):focus:not(:focus-visible) {
+  outline: none;
+}
+/* The <main> element is focus-managed on route change; it needs no visible ring. */
+main:focus {
+  outline: none;
+}
+@media (forced-colors: active) {
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
+/* ---- Skip link -------------------------------------------------------- */
+.sv-skip {
+  position: fixed;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: calc(var(--z-curtain) + 1);
+  padding: 0.85rem 1.25rem;
+  background: var(--champagne-400);
+  color: var(--espresso-900);
+  font: 500 var(--text-overline) / 1 var(--font-body);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: var(--radius-pill);
+  transform: translateY(-200%);
+}
+.sv-skip:focus-visible {
+  transform: translateY(0);
+  outline-color: var(--ivory-50);
+}
+
+/* ---- Utilities -------------------------------------------------------- */
+.sv-sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.sv-no-scrollbar {
+  scrollbar-width: none;
+}
+.sv-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

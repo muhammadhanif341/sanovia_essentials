@@ -1,0 +1,275 @@
+/* Cinematic hero + the "sheet" (next section) it hands off to.
+   The hero is STICKY: it stays put while the sheet slides over it — no pin spacer, robust in
+   dynamic-toolbar mobile browsers. GSAP only adds the scrubbed push-in / dim / lift on top of that;
+   with motion off the hand-off is still a native, purely CSS sheet-over-hero. */
+
+.sv-hero {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  overflow: clip;
+  isolation: isolate;
+  background: var(--espresso-950);
+  color: var(--fg);
+  --film-pos: 50% 42%;
+}
+/* Once the sheet fully covers the hero, don't keep painting it. */
+.sv-hero[hidden] {
+  display: none;
+}
+
+/* ---- Film ---------------------------------------------------------------------------------- */
+.sv-hero__plate,
+.sv-hero__film {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 46%;
+}
+.sv-hero__plate {
+  will-change: transform; /* the scroll push-in: one composited layer */
+}
+
+/* Layers over the film, bottom → top. All decorative and pointer-transparent. */
+.sv-hero__shade,
+.sv-hero__grain,
+.sv-hero__dim,
+.sv-hero__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Vignette · scrim under the header · scrim under the copy · faint warm grade that sits the
+   footage's cool black inside the espresso palette. */
+.sv-hero__shade {
+  z-index: 1;
+  background: radial-gradient(120% 95% at 50% 46%, transparent 52%, rgb(12 7 4 / 0.55) 100%),
+    linear-gradient(to bottom, rgb(22 13 8 / 0.7) 0, rgb(22 13 8 / 0) 24%),
+    linear-gradient(to top, rgb(22 13 8 / 0.82) 0, rgb(22 13 8 / 0) 46%), rgb(74 42 22 / 0.1);
+}
+.sv-hero .sv-lamp {
+  z-index: 1;
+  opacity: 0.55; /* over footage the lamp is a hint of warmth, not a wash */
+}
+/* Film grain: a small tiled SVG-noise texture, rasterised once (not animated). It dithers the dark
+   gradients (so H.264 banding never shows) and softens the upscale on large screens. */
+.sv-hero__grain {
+  z-index: 2;
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+.sv-hero__dim {
+  z-index: 3;
+  opacity: 0; /* GSAP: 0 → .78 as the sheet rises */
+  background: var(--espresso-950);
+  will-change: opacity;
+}
+.sv-hero__veil {
+  z-index: 6;
+  background: var(--espresso-950);
+  opacity: 0;
+  visibility: hidden; /* GSAP raises it to 1 at load and lifts it; without JS it never exists */
+}
+
+/* ---- Copy + actions ----------------------------------------------------------------------- */
+.sv-hero__content {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 4;
+  padding-bottom: max(clamp(1.5rem, 6svh, 4rem), env(safe-area-inset-bottom));
+}
+/* Align with the header's edges (viewport gutters), not the centred 1440 page container: on ultrawide
+   screens the film is huge and centred, so a centred container would put the copy ON the product. */
+.sv-hero__content .sv-container {
+  max-width: none;
+}
+.sv-hero__grid {
+  display: grid;
+  gap: var(--space-5);
+}
+.sv-hero__copy {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+.sv-hero__title {
+  font: 500 clamp(2.75rem, 12.5vw, 4.5rem) / 0.96 var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--fg);
+}
+.sv-hero__rule {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  background: var(--accent);
+  transform-origin: 0 50%;
+}
+.sv-hero__actions {
+  display: grid;
+  gap: var(--space-3);
+}
+.sv-hero__actions .sv-magnetic,
+.sv-hero__actions .sv-btn {
+  width: 100%;
+}
+
+/* ---- Rail: film control + scroll cue ------------------------------------------------------ */
+.sv-hero__rail {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+}
+.sv-hero__cue {
+  display: none;
+}
+
+/* ---- Portrait: the film is a feathered band, the copy sits below it -------------------------- */
+@media (orientation: portrait) {
+  .sv-hero {
+    --film-pos: 50% 46%;
+  }
+  .sv-hero__plate {
+    inset: var(--header-h) 0 auto 0;
+    height: min(62svh, 128vw);
+    height: min(62vh, 128vw);
+    height: min(62svh, 128vw);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 76%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 76%, transparent 100%);
+  }
+  .sv-hero__film {
+    inset: 0;
+  }
+  .sv-hero__rail {
+    top: calc(var(--header-h) + var(--space-3));
+    right: var(--gutter);
+  }
+}
+
+/* ---- Landscape: full-bleed film, copy left, actions right ------------------------------------- */
+@media (orientation: landscape) {
+  .sv-hero__grid {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    column-gap: var(--space-7);
+  }
+  .sv-hero__copy {
+    max-width: min(32rem, 36vw);
+  }
+  .sv-hero__title {
+    font-size: clamp(2.25rem, 0.9rem + 3.1vw, 4.5rem);
+  }
+  .sv-hero__actions {
+    width: min(19rem, 30vw);
+  }
+  /* A rail down the right edge: control above, cue below. Clear of the product at every frame. */
+  .sv-hero__rail {
+    top: 50%;
+    right: calc(var(--gutter) / 2 - 22px);
+    flex-direction: column;
+    gap: var(--space-5);
+    transform: translateY(-50%);
+  }
+  .sv-hero__cue {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--fg-muted);
+  }
+  .sv-hero__cue-text {
+    writing-mode: vertical-rl;
+    font: 500 0.625rem / 1 var(--font-body);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .sv-hero__cue-line {
+    position: relative;
+    display: block;
+    width: 1px;
+    height: 3rem;
+    background: var(--hairline);
+    overflow: hidden;
+  }
+  .sv-hero__cue-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateY(-100%);
+    animation: sv-cue 2.6s var(--ease-in-out) 3s infinite;
+  }
+}
+@keyframes sv-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  55%,
+  100% {
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sv-hero__cue-line::after {
+    animation: none;
+    transform: none;
+    opacity: 0.6;
+  }
+}
+
+/* Short landscape screens (phones on their side): tighten the copy so it never meets the product. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .sv-hero__title {
+    font-size: clamp(1.75rem, 5.2vh, 2.5rem);
+  }
+  .sv-hero__copy {
+    max-width: 30vw;
+  }
+  .sv-hero__actions {
+    width: 16rem;
+  }
+  .sv-hero__actions .sv-btn {
+    --_h: 44px;
+    padding-inline: 1rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+/* Tablet portrait and up: actions sit side by side under the copy instead of stacking full-width. */
+@media (orientation: portrait) and (min-width: 768px) {
+  .sv-hero__plate {
+    height: min(72svh, 130vw);
+  }
+  .sv-hero__title {
+    font-size: clamp(3.5rem, 8vw, 5.5rem);
+  }
+  .sv-hero__actions {
+    grid-template-columns: auto auto;
+    justify-content: start;
+  }
+  .sv-hero__actions .sv-magnetic,
+  .sv-hero__actions .sv-btn {
+    width: auto;
+  }
+}
+
+/* ---- The sheet: the next section, rising over the hero ------------------------------------------
+   Its top edge is the brand's arch, at full width. The corners let the hero show through as it
+   rises; a gilt hairline traces the curve; a long soft shadow lifts it off the film. */
+.sv-sheet {
+  --sheet-curve: clamp(2.5rem, 8vw, 8rem);
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-top: calc(var(--sheet-curve) + var(--space-8));
+  padding-bottom: var(--section-pad);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 50% 50% 0 0 / var(--sheet-curve) var(--sheet-curve) 0 0;
+  box-shadow: 0 -1px 0 var(--hairline-strong), 0 -40px 90px -30px rgb(0 0 0 / 0.65);
+}

@@ -1,0 +1,124 @@
+/* Style-guide-only chrome. Never shipped (route is DEV-only). */
+.sg-nav {
+  position: sticky;
+  top: var(--header-h);
+  z-index: var(--z-sticky);
+  background: rgb(30 18 11 / 0.96);
+  border-bottom: 1px solid var(--hairline);
+}
+.sg-nav ul {
+  display: flex;
+  gap: var(--space-5);
+  overflow-x: auto;
+  padding: var(--space-3) var(--gutter);
+  scrollbar-width: none;
+}
+.sg-nav a {
+  white-space: nowrap;
+  padding: var(--space-2) 0;
+  display: inline-block;
+}
+.sg-block {
+  padding-block: var(--space-8);
+  border-bottom: 1px solid var(--hairline);
+}
+.sg-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.sg-sub {
+  margin: var(--space-6) 0 var(--space-3);
+}
+.sg-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+}
+.sg-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+}
+.sg-swatch {
+  display: grid;
+  gap: var(--space-2);
+  font: 400 var(--text-small) / 1.3 var(--font-body);
+}
+.sg-swatch__chip {
+  height: 4rem;
+  border: 1px solid var(--hairline);
+}
+.sg-surface {
+  padding: var(--space-6);
+  display: grid;
+  gap: var(--space-3);
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--hairline);
+}
+.sg-readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--hairline);
+  font: 500 var(--text-small) / 1.3 var(--font-body);
+}
+.sg-readout dt {
+  color: var(--fg-muted);
+}
+.sg-readout dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.sg-bar {
+  height: 0.75rem;
+  background: var(--accent-ui);
+}
+.sg-colcell {
+  height: 3rem;
+  background: rgb(201 166 107 / 0.18);
+  border: 1px solid var(--hairline);
+}
+.sg-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.sg-demo {
+  min-height: 12rem;
+  padding: var(--space-6);
+  border: 1px dashed var(--hairline-strong);
+}
+.sg-fill {
+  height: 60vh;
+  display: grid;
+  place-items: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+}
+.sg-note {
+  color: var(--fg-muted);
+  max-width: var(--measure);
+}
+/* Sticky-stage demo: steps stack normally; in active mode they overlap and crossfade. */
+.sg-story {
+  background: var(--surface);
+  color: var(--fg);
+}
+.sg-step {
+  min-height: 40vh;
+  display: grid;
+  place-content: center;
+  padding: var(--space-6) var(--gutter);
+  text-align: center;
+  border-bottom: 1px solid var(--hairline);
+}
+.sg-story[data-stage='active'] .sg-step {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border-bottom: 0;
+}

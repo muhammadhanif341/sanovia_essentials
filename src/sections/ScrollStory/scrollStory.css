@@ -1,0 +1,50 @@
+/* Cinematic Scroll Story — pinned narrative (StickyStage). Below tablet width or under
+   reduced motion the four frames are just stacked sections (see scrollStages.js: the
+   [data-stage="active"] attribute is what switches on the pin, JS-only, reverted on cleanup). */
+
+.story {
+  position: relative;
+  background: var(--surface);
+  color: var(--fg);
+  padding-block: var(--section-pad);
+}
+.story[data-stage='active'] {
+  padding-block: 0;
+}
+
+.story__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 70vh;
+  min-height: 70svh;
+  padding-block: var(--space-8);
+}
+.story[data-stage='active'] .story__frame {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  padding-block: 0;
+}
+
+.story__inner {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+.story__numeral {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+.story__body {
+  max-width: 34rem;
+}
+.story__cta {
+  margin-top: var(--space-3);
+}

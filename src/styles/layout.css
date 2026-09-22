@@ -1,0 +1,97 @@
+/* Layout primitives: container · section · grid · stack · cluster · main.
+   Responsive foundation: the grid is 4 → 8 → 12 columns and each item declares
+   a placement PER breakpoint. Layouts are recomposed, not scaled. */
+
+/* ---- Container ---------------------------------------------------------- */
+.sv-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.sv-container--wide {
+  max-width: var(--container-wide);
+}
+.sv-container--narrow {
+  max-width: var(--container-narrow);
+}
+.sv-container--bleed {
+  max-width: none;
+  padding-inline: 0;
+}
+
+/* ---- Section: owns a surface -------------------------------------------- */
+.sv-section {
+  position: relative;
+  background: var(--surface);
+  color: var(--fg);
+  padding-block: var(--section-pad);
+}
+.sv-section--tight {
+  padding-block: calc(var(--section-pad) * 0.5);
+}
+.sv-section--flush {
+  padding-block: 0;
+}
+
+/* ---- Grid: 4 / 8 / 12 columns ------------------------------------------- */
+.sv-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  row-gap: var(--grid-row-gap, var(--grid-gap));
+}
+.sv-grid__item {
+  grid-column: var(--col-base, 1 / -1);
+  grid-row: var(--row-base, auto);
+  min-width: 0;
+}
+@media (min-width: 768px) {
+  .sv-grid__item {
+    grid-column: var(--col-md, var(--col-base, 1 / -1));
+    grid-row: var(--row-md, var(--row-base, auto));
+  }
+}
+@media (min-width: 1024px) {
+  .sv-grid__item {
+    grid-column: var(--col-lg, var(--col-md, var(--col-base, 1 / -1)));
+    grid-row: var(--row-lg, var(--row-md, var(--row-base, auto)));
+  }
+}
+@media (min-width: 1440px) {
+  .sv-grid__item {
+    grid-column: var(--col-xl, var(--col-lg, var(--col-md, var(--col-base, 1 / -1))));
+    grid-row: var(--row-xl, var(--row-lg, var(--row-md, var(--row-base, auto))));
+  }
+}
+
+/* ---- Stack / Cluster ----------------------------------------------------- */
+.sv-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap, var(--space-5));
+}
+.sv-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: var(--align, center);
+  gap: var(--gap, var(--space-4));
+}
+
+/* ---- Main / page --------------------------------------------------------- */
+.sv-main {
+  min-height: 60vh;
+  padding-top: var(--header-h); /* header is fixed */
+}
+.sv-main[data-overlap='true'] {
+  padding-top: 0; /* pages with a hero sit under a transparent header */
+}
+.sv-page-head {
+  padding-block: var(--space-9) var(--space-7);
+}
+
+/* Full-viewport helpers with dynamic-toolbar-safe units + fallbacks. */
+.sv-vh {
+  min-height: 100vh;
+  min-height: 100svh;
+}

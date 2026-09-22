@@ -1,0 +1,11 @@
+/* Brand Story — copy left in a narrow column, a large image bleeding toward the right edge. */
+
+.story-teaser__grid {
+  align-items: center;
+  row-gap: var(--space-7);
+}
+.story-teaser__copy {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+}

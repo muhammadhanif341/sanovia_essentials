@@ -1,0 +1,136 @@
+/* Dialog surface for the mobile menu (fullscreen) and order-list (drawer).
+   State-driven UI transitions are CSS (robust, no cleanup); scroll choreography is GSAP.
+   Structure differs by breakpoint: the drawer is a BOTTOM SHEET on mobile and a RIGHT
+   DRAWER from tablet up — a different pattern, not a shrunken one. */
+
+.sv-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: rgb(22 13 8 / 0);
+  transition: background-color var(--dur-base) var(--ease-out);
+  overscroll-behavior: contain;
+}
+.sv-dialog[data-state='open'] {
+  background: rgb(22 13 8 / 0.62);
+}
+.sv-dialog__panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  color: var(--fg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: none;
+}
+
+/* ---- drawer ------------------------------------------------------------- */
+.sv-dialog[data-side='drawer'] .sv-dialog__panel {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 88vh;
+  max-height: 88dvh;
+  border-top: 1px solid var(--hairline);
+  padding-bottom: env(safe-area-inset-bottom);
+  transform: translateY(100%);
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+.sv-dialog[data-side='drawer'][data-state='open'] .sv-dialog__panel {
+  transform: translateY(0);
+}
+@media (min-width: 768px) {
+  .sv-dialog[data-side='drawer'] .sv-dialog__panel {
+    left: auto;
+    top: 0;
+    width: min(30rem, 100%);
+    max-height: none;
+    border-top: 0;
+    border-left: 1px solid var(--hairline);
+    transform: translateX(100%);
+  }
+  .sv-dialog[data-side='drawer'][data-state='open'] .sv-dialog__panel {
+    transform: translateX(0);
+  }
+}
+
+/* ---- top: a panel that drops from the top edge (search) -------------------- */
+.sv-dialog[data-side='top'] .sv-dialog__panel {
+  left: 0;
+  right: 0;
+  top: 0;
+  max-height: 92vh;
+  max-height: 92dvh;
+  border-bottom: 1px solid var(--hairline);
+  padding-top: env(safe-area-inset-top);
+  transform: translateY(-101%);
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+.sv-dialog[data-side='top'][data-state='open'] .sv-dialog__panel {
+  transform: translateY(0);
+}
+
+/* ---- fullscreen ---------------------------------------------------------- */
+.sv-dialog[data-side='fullscreen'] {
+  background: transparent;
+}
+.sv-dialog[data-side='fullscreen'] .sv-dialog__panel {
+  inset: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+  clip-path: circle(0px at var(--ox, calc(100% - 2rem)) var(--oy, 2.5rem));
+  transition: clip-path var(--dur-cine) var(--ease-in-out);
+}
+.sv-dialog[data-side='fullscreen'][data-state='open'] .sv-dialog__panel {
+  clip-path: circle(150vmax at var(--ox, calc(100% - 2rem)) var(--oy, 2.5rem));
+}
+
+/* Caller-choreographed (GSAP) fullscreen: no CSS wipe, no CSS stagger. The panel is transparent —
+   the caller paints its own background layers — and stops catching clicks the instant it starts
+   closing, so the page is usable while the exit animation finishes. */
+.sv-dialog[data-motion='external'][data-side='fullscreen'] .sv-dialog__panel {
+  clip-path: none;
+  transition: none;
+  background: transparent;
+}
+.sv-dialog[data-motion='external'][data-state='closed'] {
+  pointer-events: none;
+}
+
+/* Staggered entrance for children tagged with --i (CSS-driven fullscreen). */
+.sv-dialog [data-stagger] > * {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+}
+.sv-dialog[data-state='open'] [data-stagger] > * {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(0.25s + var(--i, 0) * 70ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sv-dialog [data-stagger] > * {
+    transform: none;
+    transition-delay: 0s !important;
+  }
+}
+
+.sv-dialog__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: var(--header-h);
+  padding: 0 var(--gutter);
+  flex: none;
+}
+.sv-dialog__close {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -0.5rem;
+  color: var(--fg);
+  cursor: pointer;
+}

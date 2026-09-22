@@ -1,0 +1,6 @@
+/* Self-hosted variable fonts (OFL) via Fontsource — no third-party font requests.
+   Browsers only fetch the unicode-range subsets a page actually uses.
+   Cormorant is thin: keep weight ≥500 below 28px, never for body copy. */
+@import '@fontsource-variable/cormorant/wght.css';
+@import '@fontsource-variable/cormorant/wght-italic.css';
+@import '@fontsource-variable/jost/wght.css';

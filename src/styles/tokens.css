@@ -1,0 +1,243 @@
+/* ==========================================================================
+   SANOVIA ESSENTIALS — DESIGN TOKENS
+   Single source of truth for colour, type, space, layout and motion.
+   Derived from DESIGN-BLUEPRINT.md §2–4.
+
+   • Colours were read by eye from an Instagram screenshot. RE-SAMPLE from the
+     original logo / photography before launch.
+   • Contrast is enforced by `npm run check:contrast`, which parses THIS file.
+     Change a colour here and that script tells you if a pairing now fails.
+   • Components never use raw hex or primitives — only the semantic tokens
+     (--surface, --fg, --accent …), which each [data-surface] redefines.
+   ========================================================================== */
+
+:root {
+  /* ---- Colour primitives ------------------------------------------------ */
+  --espresso-950: #160d08;
+  --espresso-900: #1e120b;
+  --espresso-800: #2a1a11;
+  --espresso-700: #3a2417; /* ≈ logo disc */
+  --walnut-600: #5a3a28;
+  --champagne-300: #e2c99a;
+  --champagne-400: #c9a66b; /* ≈ wordmark gold */
+  --champagne-500: #b08a4e;
+  --brass-700: #7d5a22; /* gold as TEXT on light */
+  --brass-800: #654716;
+  --ivory-50: #f7f1e7;
+  --cream-100: #ede3d3;
+  --sand-200: #dccdb5;
+  --taupe-600: #6b5a4a; /* muted text on light */
+  --ink: #1c120c;
+  --plum-800: #33223b;
+  --plum-700: #4a3352;
+  --burgundy-600: #7a1f2b;
+  --burgundy-300: #d98a93;
+  --mailer-300: #c7d0d8; /* cool neutral — packing story only */
+  --error-dark: #e58a7a;
+  --error-light: #a32e22;
+  --success-dark: #9dbb8a;
+  --success-light: #4a6b3a;
+
+  /* ---- Typography ------------------------------------------------------- */
+  --font-display: 'Cormorant Variable', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'Jost Variable', 'Avenir Next', 'Century Gothic', system-ui, -apple-system, 'Segoe UI', Roboto,
+    sans-serif;
+
+  --text-display-xl: clamp(3.25rem, 1.2rem + 9.2vw, 10rem);
+  --text-display-l: clamp(2.5rem, 1rem + 5.5vw, 6rem);
+  --text-h1: clamp(2.25rem, 1.2rem + 3.6vw, 4.5rem);
+  --text-h2: clamp(1.75rem, 1rem + 2.4vw, 3rem);
+  --text-h3: clamp(1.375rem, 1rem + 1vw, 1.875rem);
+  --text-quote: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
+  --text-body-l: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-overline: 0.75rem;
+  --text-numeral: clamp(4rem, 2rem + 12vw, 14rem);
+
+  --leading-display: 0.92;
+  --leading-heading: 1.08;
+  --leading-body: 1.65;
+  --tracking-display: -0.02em;
+  --tracking-overline: 0.22em;
+
+  /* ---- Space (4px base, 8pt steps) ------------------------------------- */
+  --space-1: 0.25rem; /* 4  */
+  --space-2: 0.5rem; /* 8  */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem; /* 16 */
+  --space-5: 1.5rem; /* 24 */
+  --space-6: 2rem; /* 32 */
+  --space-7: 3rem; /* 48 */
+  --space-8: 4rem; /* 64 */
+  --space-9: 6rem; /* 96 */
+  --space-10: 8rem; /* 128 */
+  --space-11: 12rem; /* 192 */
+  --section-pad: clamp(6rem, 12vw, 12rem); /* spacious: density 3/10 */
+  --gutter: clamp(1.25rem, 5vw, 5rem);
+
+  /* ---- Layout ----------------------------------------------------------- */
+  --container-max: 1440px;
+  --container-wide: 1680px;
+  --container-narrow: 960px;
+  --measure: 62ch;
+  --header-h: 64px;
+  --control-h: 48px;
+  --grid-cols: 4;
+  --grid-gap: 1rem;
+
+  /* ---- Shape ------------------------------------------------------------ */
+  --radius-none: 0;
+  --radius-pill: 9999px;
+  --shape-arch: 999px 999px 0 0;
+  --shape-oval: 50%;
+  --shape-tonneau: 32% / 21%;
+  --hairline-w: 1px;
+
+  /* ---- Motion (mirrored in src/animations/tokens.js) --------------------- */
+  --dur-fast: 0.2s;
+  --dur-base: 0.4s;
+  --dur-slow: 0.7s;
+  --dur-cine: 1.2s;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* ≈ expo.out   */
+  --ease-in-out: cubic-bezier(0.87, 0, 0.13, 1); /* ≈ expo.inOut */
+
+  /* ---- Layering --------------------------------------------------------- */
+  --z-raised: 2;
+  --z-sticky: 10;
+  --z-fab: 40;
+  --z-header: 50;
+  --z-drawer: 60;
+  --z-overlay: 70;
+  --z-curtain: 90;
+}
+
+/* ---- Breakpoints: mobile <768 · tablet 768 · laptop 1024 · desktop 1440 ----
+   CSS can't read custom properties inside @media, so the numbers live here
+   and in src/animations/media.js (BP). Keep the two in sync.                  */
+@media (min-width: 768px) {
+  :root {
+    --header-h: 72px;
+    --grid-cols: 8;
+    --grid-gap: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --grid-cols: 12;
+    --grid-gap: 2rem;
+  }
+}
+@media (min-width: 1440px) {
+  :root {
+    --grid-gap: 3rem;
+  }
+}
+
+/* Touch: bigger targets. Independent of width (an iPad Pro is ≥1024 and coarse). */
+@media (pointer: coarse) {
+  :root {
+    --control-h: 52px;
+  }
+}
+
+/* Reduced motion: collapse durations, keep them non-zero so transitionend fires. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.001s;
+    --dur-base: 0.001s;
+    --dur-slow: 0.001s;
+    --dur-cine: 0.001s;
+  }
+}
+
+/* ==========================================================================
+   SURFACES — the semantic layer.
+   A surface redefines every semantic token, so any component dropped onto any
+   surface stays legible. Sections opt in with data-surface="…".
+   ========================================================================== */
+
+/* Dark family (default). */
+:root,
+[data-surface='dark'],
+[data-surface='darker'],
+[data-surface='raised'] {
+  --surface: var(--espresso-900);
+  --surface-raised: var(--espresso-800);
+  --fg: var(--ivory-50);
+  --fg-muted: var(--sand-200);
+  --accent: var(--champagne-400); /* gold usable as text */
+  --accent-strong: var(--champagne-300);
+  --accent-ui: var(--champagne-500); /* gold for borders / icons (non-text) */
+  --hairline: rgb(201 166 107 / 0.24);
+  --hairline-strong: rgb(201 166 107 / 0.5);
+  --focus: var(--champagne-300);
+  --btn-bg: var(--champagne-400);
+  --btn-fg: var(--espresso-900);
+  --btn-bg-hover: var(--champagne-300);
+  --field-bg: rgb(247 241 231 / 0.04);
+  --field-border: var(--champagne-500);
+  --danger: var(--error-dark);
+  --success: var(--success-dark);
+  --scrim: rgb(22 13 8 / 0.78);
+  color-scheme: dark;
+}
+[data-surface='darker'] {
+  --surface: var(--espresso-950);
+  --surface-raised: var(--espresso-900);
+}
+[data-surface='raised'] {
+  --surface: var(--espresso-800);
+  --surface-raised: var(--espresso-700);
+}
+
+/* Light family: ivory + cream. Gold text uses brass, never champagne (2.04:1). */
+[data-surface='ivory'],
+[data-surface='cream'] {
+  --surface: var(--ivory-50);
+  --surface-raised: var(--cream-100);
+  --fg: var(--ink);
+  --fg-muted: var(--taupe-600);
+  --accent: var(--brass-700);
+  --accent-strong: var(--brass-800);
+  --accent-ui: var(--brass-700);
+  --hairline: rgb(28 18 12 / 0.14);
+  --hairline-strong: rgb(28 18 12 / 0.4);
+  --focus: var(--espresso-700);
+  --btn-bg: var(--espresso-900);
+  --btn-fg: var(--ivory-50);
+  --btn-bg-hover: var(--espresso-700);
+  --field-bg: rgb(28 18 12 / 0.03);
+  --field-border: var(--brass-700);
+  --danger: var(--error-light);
+  --success: var(--success-light);
+  --scrim: rgb(247 241 231 / 0.86);
+  color-scheme: light;
+}
+[data-surface='cream'] {
+  --surface: var(--cream-100);
+  --surface-raised: var(--ivory-50);
+}
+
+/* Plum: the jewellery-editorial passage. */
+[data-surface='plum'] {
+  --surface: var(--plum-800);
+  --surface-raised: var(--plum-700);
+  --fg: var(--ivory-50);
+  --fg-muted: var(--sand-200);
+  --accent: var(--champagne-400);
+  --accent-strong: var(--champagne-300);
+  --accent-ui: var(--champagne-500);
+  --hairline: rgb(201 166 107 / 0.28);
+  --hairline-strong: rgb(201 166 107 / 0.55);
+  --focus: var(--champagne-300);
+  --btn-bg: var(--champagne-400);
+  --btn-fg: var(--espresso-900);
+  --btn-bg-hover: var(--champagne-300);
+  --field-bg: rgb(247 241 231 / 0.05);
+  --field-border: var(--champagne-500);
+  --danger: var(--error-dark);
+  --success: var(--success-dark);
+  --scrim: rgb(28 18 34 / 0.8);
+  color-scheme: dark;
+}

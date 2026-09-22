@@ -1,0 +1,67 @@
+/* Best Sellers — an editorial numbered list, not a card grid: large typography carries it.
+   Each row is a real interactive target (product interaction), not a static line. */
+
+.sellers__head {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+  margin-bottom: var(--space-7);
+}
+
+.sellers__list {
+  border-top: 1px solid var(--hairline);
+}
+.sellers__row {
+  border-bottom: 1px solid var(--hairline);
+}
+.sellers__link {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+  color: inherit;
+  text-decoration: none;
+  transition: padding-inline var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+.sellers__index {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.sellers__name {
+  min-width: 0;
+}
+.sellers__arrow {
+  color: var(--accent);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+@media (hover: hover) {
+  .sellers__link:hover {
+    padding-inline: var(--space-3) 0;
+    color: var(--accent-strong);
+  }
+  .sellers__link:hover .sellers__arrow {
+    transform: translate(4px, -4px);
+  }
+}
+.sellers__link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+@media (max-width: 767.98px) {
+  .sellers__link {
+    grid-template-columns: auto 1fr auto;
+  }
+  .sellers__price {
+    display: none;
+  }
+}
+
+.sellers__empty {
+  padding-block: var(--space-7) var(--space-5);
+  border-top: 1px solid var(--hairline);
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+}

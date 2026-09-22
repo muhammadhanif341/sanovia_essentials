@@ -1,0 +1,25 @@
+/* Jewellery Editorial — copy sits in a wide column with a full track of negative space
+   beside it; the two photos overlap by one grid track on desktop (a deliberate layered
+   composition, not a rendering accident) with the second lifted forward and down. */
+
+.jewel__grid {
+  align-items: start;
+  row-gap: var(--space-6);
+}
+.jewel__copy {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+}
+.jewel__media {
+  position: relative;
+}
+@media (min-width: 1024px) {
+  .jewel__media--b {
+    z-index: 2;
+    margin-top: var(--space-9);
+  }
+  .jewel__media--a {
+    margin-top: var(--space-5);
+  }
+}

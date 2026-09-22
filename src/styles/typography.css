@@ -1,0 +1,107 @@
+/* Type roles (DESIGN-BLUEPRINT §3.2). Use these classes — or <Heading>/<Text>/<Overline> —
+   rather than restyling elements. Visual size is decoupled from heading level. */
+
+.t-display-xl,
+.t-display-l,
+.t-h1,
+.t-h2,
+.t-h3,
+.t-quote,
+.t-numeral {
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.t-display-xl {
+  font-size: var(--text-display-xl);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+}
+.t-display-l {
+  font-size: var(--text-display-l);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+}
+.t-h1 {
+  font-size: var(--text-h1);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.t-h2 {
+  font-size: var(--text-h2);
+  line-height: 1.1;
+}
+.t-h3 {
+  font-size: var(--text-h3);
+  line-height: 1.2;
+}
+.t-quote {
+  font-size: var(--text-quote);
+  line-height: 1.25;
+  font-style: italic;
+}
+.t-numeral {
+  font-size: var(--text-numeral);
+  line-height: 0.8;
+  font-weight: 400;
+  opacity: 0.1;
+  user-select: none;
+}
+
+.t-body-l {
+  font: 300 var(--text-body-l) / 1.6 var(--font-body);
+}
+.t-body {
+  font: 400 var(--text-body) / var(--leading-body) var(--font-body);
+}
+.t-small {
+  font: 400 var(--text-small) / 1.5 var(--font-body);
+  letter-spacing: 0.01em;
+}
+.t-price {
+  font: 500 1rem / 1 var(--font-body);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Overline: the ONLY all-caps text. Echoes the logo's tracked "ESSENTIALS" line. */
+.t-overline {
+  font: 500 var(--text-overline) / 1.3 var(--font-body);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+}
+
+.t-muted {
+  color: var(--fg-muted);
+}
+.t-accent {
+  color: var(--accent);
+}
+
+/* The signature move: ONE italic accent word per headline. */
+.t-display-xl em,
+.t-display-l em,
+.t-h1 em,
+.t-h2 em,
+h1 em,
+h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+.t-measure {
+  max-width: var(--measure);
+}
+
+/* Tighter display on small screens: don't just scale the desktop composition down. */
+@media (max-width: 767.98px) {
+  .t-display-xl {
+    line-height: 0.96;
+    letter-spacing: -0.015em;
+  }
+  .t-overline {
+    letter-spacing: 0.18em;
+  }
+}

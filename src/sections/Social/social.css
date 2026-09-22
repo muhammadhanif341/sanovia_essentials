@@ -1,0 +1,21 @@
+/* Social / Instagram — a mosaic, not a uniform grid: two unequal rows at desktop width
+   (6+3+3, then 3+3+6). Two-up everywhere narrower, so it never degrades to a single column
+   wall of squares. */
+
+.social__head {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+  margin-bottom: var(--space-7);
+}
+.social__grid {
+  row-gap: var(--grid-gap);
+}
+.social__tile {
+  min-width: 0;
+}
+.social__foot {
+  margin-top: var(--space-8);
+  display: flex;
+  justify-content: center;
+}

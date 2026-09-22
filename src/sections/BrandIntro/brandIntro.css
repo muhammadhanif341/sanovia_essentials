@@ -1,0 +1,33 @@
+/* Brand Introduction — typography-only hand-off sheet. See hero.css for .sv-sheet itself;
+   this file only lays out what sits inside it. */
+
+.brand-intro__grid {
+  align-items: start;
+}
+.brand-intro__copy {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+}
+.brand-intro__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+/* The ghost numeral: pure negative space on phones/tablets (a second column here would
+   crowd the copy on a narrow measure), a quiet counterweight on wide layouts. */
+.brand-intro__mark {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .brand-intro__mark {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    line-height: 1;
+  }
+  .brand-intro__mark .t-numeral {
+    font-size: clamp(6rem, 11vw, 11rem);
+  }
+}

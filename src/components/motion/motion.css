@@ -1,0 +1,313 @@
+/* Motion components. Structure for scroll stages is progressive enhancement:
+   the DEFAULT (no data-attribute) is a native scroll-snap carousel / stacked steps;
+   JS switches to sticky, scrubbed mode only when the `full`/`tabletUp` media
+   condition holds, by setting data-hscroll="active" / data-stage="active". */
+
+/* ---- Page-transition curtain ------------------------------------------------ */
+.sv-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-curtain);
+  display: grid;
+  place-items: center;
+  background: var(--espresso-950);
+  visibility: hidden;
+  opacity: 0;
+}
+.sv-curtain .sv-logo__disc {
+  --logo-size: 4.5rem;
+}
+
+/* ---- Scroll-progress ring (wraps the logo disc) ------------------------------- */
+.sv-ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: calc(var(--logo-size, 2.5rem) + 10px);
+  height: calc(var(--logo-size, 2.5rem) + 10px);
+}
+.sv-ring__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.sv-ring__track {
+  fill: none;
+  stroke: var(--hairline);
+  stroke-width: 1;
+}
+.sv-ring__bar {
+  fill: none;
+  stroke: var(--champagne-400);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0; /* JS reveals it; under reduced motion only the static track shows */
+}
+
+/* ---- Lamp glow (hero light) ---------------------------------------------------- */
+.sv-lamp {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(120vmax, 1400px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(201 166 107 / 0.16), rgb(201 166 107 / 0.05) 55%, transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+.sv-lamp-host {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ---- Horizontal scroller ---------------------------------------------------------- */
+.sv-hscroll {
+  position: relative;
+}
+.sv-hscroll__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+.sv-hscroll__track {
+  display: flex;
+  gap: var(--grid-gap);
+  padding-inline: var(--gutter);
+  scroll-padding-inline: var(--gutter);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.sv-hscroll__track::-webkit-scrollbar {
+  display: none;
+}
+.sv-hscroll__item {
+  flex: 0 0 min(78vw, 22rem);
+  scroll-snap-align: start;
+  min-width: 0;
+}
+@media (min-width: 768px) {
+  .sv-hscroll__item {
+    flex-basis: clamp(18rem, 36vw, 26rem);
+  }
+}
+.sv-hscroll__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-inline: var(--gutter);
+}
+.sv-hscroll__arrows {
+  display: flex;
+  gap: var(--space-2);
+}
+.sv-hscroll__arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--accent-ui);
+  border-radius: 50%;
+  color: var(--fg);
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+@media (hover: hover) {
+  .sv-hscroll__arrow:hover {
+    background: var(--accent);
+    color: var(--surface);
+  }
+}
+.sv-hscroll__progress {
+  display: none;
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+.sv-hscroll__progress::after {
+  content: '';
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--hscroll-progress, 0));
+}
+
+/* Active (scrubbed) mode: the wrapper gains vertical runway equal to the horizontal
+   distance; a sticky stage holds the track while it translates. */
+.sv-hscroll[data-hscroll='active'] {
+  height: calc(100vh + var(--hscroll-distance, 0px));
+  height: calc(100svh + var(--hscroll-distance, 0px));
+}
+.sv-hscroll[data-hscroll='active'] .sv-hscroll__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  justify-content: center;
+  overflow: hidden;
+  overflow: clip; /* clip: focus can't scroll the stage — we scroll the window instead */
+}
+.sv-hscroll[data-hscroll='active'] .sv-hscroll__track {
+  width: max-content;
+  overflow: visible;
+  scroll-snap-type: none;
+  will-change: transform;
+}
+.sv-hscroll[data-hscroll='active'] .sv-hscroll__item {
+  flex-basis: clamp(18rem, 26vw, 26rem);
+}
+.sv-hscroll[data-hscroll='active'] .sv-hscroll__progress {
+  display: block;
+}
+
+/* ---- Sticky stage (pinned storytelling) ------------------------------------------- */
+.sv-stage[data-stage='active'] {
+  height: calc(var(--stage-steps, 3) * 100vh);
+  height: calc(var(--stage-steps, 3) * 100svh);
+}
+.sv-stage[data-stage='active'] .sv-stage__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  overflow: clip;
+}
+
+/* ---- Marquee: CSS-driven (compositor thread, zero JS per frame) -------------------- */
+.sv-marquee {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.sv-marquee__viewport {
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.sv-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: sv-marquee var(--marquee-dur, 40s) linear infinite;
+}
+.sv-marquee__group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-7);
+  padding-right: var(--space-7);
+}
+.sv-marquee[data-paused='true'] .sv-marquee__track {
+  animation-play-state: paused;
+}
+@media (hover: hover) {
+  .sv-marquee:hover .sv-marquee__track {
+    animation-play-state: paused;
+  }
+}
+.sv-marquee:focus-within .sv-marquee__track {
+  animation-play-state: paused;
+}
+.sv-marquee__toggle {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--accent-ui);
+  border-radius: 50%;
+  color: var(--fg);
+  cursor: pointer;
+}
+@keyframes sv-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+/* Reduced motion: no movement. The strip becomes a wrapped, static list; duplicate hidden. */
+@media (prefers-reduced-motion: reduce) {
+  .sv-marquee__track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+  }
+  .sv-marquee__group {
+    flex-wrap: wrap;
+  }
+  .sv-marquee__group[aria-hidden='true'],
+  .sv-marquee__toggle {
+    display: none;
+  }
+  .sv-marquee__viewport {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
+
+.sv-magnetic {
+  display: inline-flex;
+}
+
+/* ---- WhatsApp FAB: quiet by default, warms up on hover/focus ------------------------- */
+.sv-fab {
+  position: fixed;
+  right: max(var(--space-5), env(safe-area-inset-right));
+  bottom: max(var(--space-5), env(safe-area-inset-bottom));
+  z-index: var(--z-fab);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 52px;
+  padding: 0 0.95rem;
+  border-radius: var(--radius-pill);
+  background: var(--espresso-800);
+  color: var(--champagne-400);
+  border: 1px solid var(--hairline-strong);
+  text-decoration: none;
+  box-shadow: 0 8px 28px rgb(22 13 8 / 0.35);
+  transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+.sv-fab__tip {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font: 500 var(--text-small) / 1 var(--font-body);
+  transition: max-width var(--dur-base) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .sv-fab:hover,
+  .sv-fab:focus-visible {
+    background: var(--champagne-400);
+    color: var(--espresso-900);
+    transform: translateY(-2px);
+  }
+  .sv-fab:hover .sv-fab__tip,
+  .sv-fab:focus-visible .sv-fab__tip {
+    max-width: 10rem;
+  }
+}
+.sv-fab:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+/* Small phones: icon only, doesn't crowd content or the safe area. */
+@media (max-width: 420px) {
+  .sv-fab {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    justify-content: center;
+  }
+}

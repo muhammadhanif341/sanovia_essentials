@@ -1,0 +1,203 @@
+/* Buttons · text links · tags. All colours come from semantic tokens, so every
+   control works on every surface. Hover effects only where hover exists. */
+
+/* ---- Button ------------------------------------------------------------- */
+.sv-btn {
+  --_h: var(--control-h);
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75em;
+  min-height: var(--_h);
+  max-width: 100%; /* a button can never be wider than its container… */
+  padding: 0.5rem 1.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  font: 500 var(--text-overline) / 1.3 var(--font-body);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal; /* …so a long label wraps instead of forcing horizontal page scroll (WCAG 1.4.10) */
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
+}
+/* The hover fill sweeps up from the bottom — a transform, never a layout property. */
+.sv-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--_hover-bg);
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+@media (hover: hover) {
+  .sv-btn:not([disabled], [aria-disabled='true']):hover::before {
+    transform: scaleY(1);
+  }
+}
+.sv-btn:not([disabled], [aria-disabled='true']):active {
+  transform: translateY(1px);
+}
+
+.sv-btn--primary {
+  --_hover-bg: var(--btn-bg-hover);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}
+.sv-btn--ghost {
+  --_hover-bg: var(--accent);
+  border-color: var(--accent-ui);
+  color: var(--fg);
+}
+@media (hover: hover) {
+  .sv-btn--ghost:not([disabled], [aria-disabled='true']):hover {
+    color: var(--surface);
+  }
+}
+/* Keyboard focus mirrors hover so the state is never hover-only. */
+.sv-btn--ghost:focus-visible {
+  color: var(--surface);
+}
+.sv-btn--ghost:focus-visible::before {
+  transform: scaleY(1);
+}
+
+.sv-btn--sm {
+  --_h: 44px; /* never below the 44px touch target, even when "small" */
+  padding: 0.4rem 1.25rem;
+}
+.sv-btn--lg {
+  --_h: calc(var(--control-h) + 8px);
+  padding: 0.5rem 2.25rem;
+}
+.sv-btn--block {
+  width: 100%;
+}
+
+.sv-btn__icon {
+  display: inline-flex;
+}
+/* The icon (e.g. Plus → Check on "add to cart") is a fresh DOM node each time it swaps —
+   a different icon component, not a re-rendered one — so this replays automatically. */
+.sv-btn__icon svg {
+  animation: sv-btn-icon-in var(--dur-base) var(--ease-out);
+}
+@keyframes sv-btn-icon-in {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+.sv-btn[disabled],
+.sv-btn[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.sv-btn[aria-busy='true'] {
+  cursor: progress;
+  pointer-events: none;
+}
+.sv-btn[aria-busy='true'] .sv-btn__label {
+  opacity: 0.55;
+}
+.sv-btn__spinner {
+  width: 1em;
+  height: 1em;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: sv-spin 0.8s linear infinite;
+}
+@keyframes sv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sv-btn__spinner {
+    animation-duration: 2.4s; /* still communicates "working", far less motion */
+  }
+}
+@media (forced-colors: active) {
+  .sv-btn {
+    border-color: ButtonText;
+  }
+}
+
+/* ---- Text link: hairline underline draws in on hover ---------------------- */
+.sv-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--accent);
+  text-decoration: none;
+  padding-block: 0.25em; /* comfortable target without changing rhythm */
+}
+.sv-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.1em;
+  height: 1px;
+  background: currentColor;
+  transform-origin: 100% 50%;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+@media (hover: hover) {
+  .sv-link:hover {
+    color: var(--accent-strong); /* contrast-checked: `accent-strong` on every surface */
+  }
+}
+.sv-link--plain {
+  color: inherit;
+}
+.sv-link--plain::after {
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+@media (hover: hover) {
+  .sv-link--plain:hover {
+    color: inherit;
+  }
+  .sv-link--plain:hover::after {
+    transform: scaleX(1);
+  }
+}
+.sv-link[aria-current='page']::after {
+  transform: scaleX(1);
+}
+
+/* ---- Tag ------------------------------------------------------------------ */
+.sv-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 0.9em;
+  border: 1px solid var(--accent-ui);
+  border-radius: var(--radius-pill);
+  color: var(--fg);
+  font: 500 0.6875rem / 1 var(--font-body);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.sv-tag--limited {
+  border-color: transparent;
+  background: var(--burgundy-600);
+  color: var(--ivory-50); /* 9.08:1 */
+}
+.sv-tag--solid {
+  border-color: transparent;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}

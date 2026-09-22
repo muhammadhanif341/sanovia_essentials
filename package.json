@@ -1,0 +1,32 @@
+{
+  "name": "sanovia-essentials",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Sanovia Essentials — jewellery & watches storefront (Phase 2: design system + architecture)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check": "npm run check:contrast && npm run lint && npm run build"
+  },
+  "dependencies": {
+    "@fontsource-variable/cormorant": "^5.3.0",
+    "@fontsource-variable/jost": "^5.3.0",
+    "gsap": "^3.15.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "^9.39.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0",
+    "vite": "^8.3.0"
+  }
+}

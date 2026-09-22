@@ -1,0 +1,26 @@
+/* Featured Collection — one large spotlight, not a grid. Asymmetric split: a wide image,
+   a narrower copy column offset toward the far edge (negative space between them). */
+
+.featured__grid {
+  align-items: center;
+  row-gap: var(--space-7);
+}
+.featured__media {
+  position: relative;
+}
+.featured__tag {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: 2;
+}
+.featured__copy {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+}
+.featured__actions {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+}

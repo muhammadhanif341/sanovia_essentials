@@ -1,0 +1,39 @@
+/* Newsletter — minimal entrance: a single centred column, one fade, generous space either
+   side. The "subscribe" is a WhatsApp hand-off (see Newsletter.jsx), styled like an ordinary
+   inline form so it reads as the real, working feature it is. */
+
+.newsletter {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+.newsletter__body {
+  margin-bottom: var(--space-2);
+}
+.newsletter__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: var(--space-3);
+  width: 100%;
+}
+.newsletter__field {
+  flex: 1 1 16rem;
+  text-align: left;
+}
+.newsletter__submit {
+  flex: none;
+}
+@media (max-width: 479.98px) {
+  .newsletter__row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .newsletter__submit {
+    width: 100%;
+  }
+}

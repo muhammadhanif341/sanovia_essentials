@@ -1,0 +1,87 @@
+/* Shop listing: category pills, search, sort, filter disclosure. Editorial, not a SaaS
+   sidebar — one row that wraps, a panel that drops open beneath it, nothing boxed in cards. */
+
+.sv-shop-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--hairline);
+}
+.sv-shop-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-6);
+}
+.sv-shop-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+.sv-shop-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-pill);
+  color: var(--fg-muted);
+}
+.sv-shop-search:focus-within {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+.sv-shop-search input {
+  min-width: 0;
+  width: 10rem;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  font: 400 var(--text-small) / 1.2 var(--font-body);
+  outline: 0;
+}
+.sv-shop-search input::placeholder {
+  color: var(--fg-muted);
+}
+.sv-shop-sort {
+  min-width: 9.5rem;
+}
+.sv-shop-sort .sv-input,
+.sv-shop-sort .sv-select__control {
+  min-height: 44px;
+  border-radius: var(--radius-pill);
+  padding-block: 0.4rem;
+}
+
+.sv-shop-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+}
+.sv-shop-filters__price {
+  display: flex;
+  gap: var(--space-4);
+}
+.sv-shop-filters__price .sv-field {
+  width: 9rem;
+}
+
+.sv-shop-count {
+  margin-bottom: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .sv-shop-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,22 @@
+/* Customer Reviews — centred, spacious, deliberately quiet: the section is an honest "not
+   yet" rather than a wall of quotes, so it should never compete for attention. */
+
+.reviews {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding-block: var(--space-6);
+}
+.reviews__mark {
+  font: 400 5rem/1 var(--font-display);
+  color: var(--accent);
+  opacity: 0.35;
+}
+.reviews__line {
+  color: var(--fg);
+  max-width: 30rem;
+}
+.reviews__body {
+  margin-bottom: var(--space-2);
+}

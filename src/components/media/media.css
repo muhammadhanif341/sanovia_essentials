@@ -1,0 +1,224 @@
+/* Image treatments (DESIGN-BLUEPRINT §5.1 ShapeMedia): shape masks, aspect ratios,
+   hover swap, scrims, gilt frame, tonal placeholders. Shapes are border-radius masks on
+   the OUTER element; reveal/parallax animate INNER layers, so shape + motion never fight. */
+
+.sv-media {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  aspect-ratio: var(--ratio, 4 / 5);
+  background: var(--walnut-600); /* blur-up colour while the image loads: no layout shift, no flash */
+}
+.sv-media[data-shape='arch'] {
+  border-radius: var(--shape-arch);
+}
+.sv-media[data-shape='oval'] {
+  border-radius: var(--shape-oval);
+}
+.sv-media[data-shape='circle'] {
+  border-radius: 50%;
+}
+.sv-media[data-shape='tonneau'] {
+  border-radius: var(--shape-tonneau);
+}
+.sv-media[data-shape='pill'] {
+  border-radius: var(--radius-pill);
+}
+.sv-media[data-shape='rect'] {
+  border-radius: 0;
+}
+
+.sv-media__inner,
+.sv-media__plx {
+  position: absolute;
+  inset: 0;
+}
+/* Parallax layer is oversized so travelling ±8% never reveals an edge. */
+.sv-media[data-parallax] .sv-media__plx {
+  inset: -9% 0;
+}
+.sv-media__plx picture {
+  display: block;
+  height: 100%;
+}
+.sv-media__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--object-pos, 50% 50%);
+  transition: transform var(--dur-cine) var(--ease-out), opacity var(--dur-slow) var(--ease-out);
+}
+.sv-media__img--hover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+/* Hover swap + zoom: fine pointers only. Touch never depends on hover. */
+@media (hover: hover) and (pointer: fine) {
+  .sv-media[data-hover]:hover .sv-media__img--hover,
+  .sv-media[data-hover]:focus-within .sv-media__img--hover {
+    opacity: 1;
+  }
+  .sv-media[data-zoom]:hover .sv-media__img:not(.sv-media__img--hover) {
+    transform: scale(1.04);
+  }
+}
+
+/* Gilt frame: a hairline inside the mask edge. */
+.sv-media[data-frame]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--hairline-strong);
+  pointer-events: none;
+}
+
+/* Scrims for text-on-photo. Text on them must clear 4.5:1 against the LIGHTEST pixels. */
+.sv-media__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.sv-media__scrim[data-scrim='bottom'] {
+  background: linear-gradient(to top, rgb(22 13 8 / 0.82), rgb(22 13 8 / 0) 58%);
+}
+.sv-media__scrim[data-scrim='top'] {
+  background: linear-gradient(to bottom, rgb(22 13 8 / 0.82), rgb(22 13 8 / 0) 58%);
+}
+.sv-media__scrim[data-scrim='full'] {
+  background: rgb(22 13 8 / 0.5);
+}
+
+/* ---- Placeholder: tonal block + "shot needed" label ------------------------ */
+.sv-ph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  text-align: center;
+  background: var(--_ph-bg);
+  color: var(--_ph-fg);
+}
+.sv-ph::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed currentColor;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.sv-ph[data-tone='walnut'] {
+  --_ph-bg: var(--walnut-600);
+  --_ph-fg: var(--ivory-50); /* 9.03:1 */
+}
+.sv-ph[data-tone='plum'] {
+  --_ph-bg: var(--plum-700);
+  --_ph-fg: var(--ivory-50); /* 9.91:1 */
+}
+.sv-ph[data-tone='cream'] {
+  --_ph-bg: var(--cream-100);
+  --_ph-fg: var(--ink); /* 14.48:1 */
+}
+.sv-ph[data-tone='espresso'] {
+  --_ph-bg: var(--espresso-700);
+  --_ph-fg: var(--champagne-400); /* 6.33:1 */
+}
+.sv-ph__label {
+  font: 500 var(--text-overline) / 1.4 var(--font-body);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+}
+.sv-ph__spec {
+  font: 400 var(--text-small) / 1.4 var(--font-body);
+  opacity: 0.85;
+}
+
+/* ---- Logo (PLACEHOLDER until brand files arrive) ----------------------------- */
+.sv-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--accent);
+}
+.sv-logo__disc {
+  display: inline-grid;
+  place-items: center;
+  width: var(--logo-size, 2.5rem);
+  height: var(--logo-size, 2.5rem);
+  border-radius: 50%;
+  background: var(--espresso-700);
+  box-shadow: inset 0 0 0 1px rgb(201 166 107 / 0.45);
+  color: var(--champagne-400);
+  font: 500 calc(var(--logo-size, 2.5rem) * 0.52) / 1 var(--font-display);
+}
+.sv-logo__type {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.3em;
+  line-height: 1;
+}
+.sv-logo__word {
+  font: 500 1.125rem / 1 var(--font-display);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--champagne-400);
+}
+.sv-logo__sub {
+  font: 500 0.5rem / 1 var(--font-body);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* ---- Film (hero video) -------------------------------------------------------------
+   <FilmVideo/> fills its parent and covers it; the focal point is a CSS variable so a page
+   can re-frame the SAME film per breakpoint without touching the component. */
+.sv-herovideo {
+  position: relative;
+}
+.sv-film {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--espresso-950);
+}
+.sv-film__el {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--film-pos, 50% 50%);
+}
+.sv-film-ctl {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgb(22 13 8 / 0.55);
+  color: var(--fg);
+  border: 1px solid var(--hairline-strong);
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+@media (hover: hover) {
+  .sv-film-ctl:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--espresso-900);
+  }
+}
+.sv-film-ctl--corner {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 3;
+}
