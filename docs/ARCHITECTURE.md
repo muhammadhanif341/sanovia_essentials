@@ -613,3 +613,42 @@ build) green throughout.
 notification — no email provider configured), a real backend for order storage and server-side re-validation, an
 admin UI to act on `updateOrderStatus`/`updatePaymentStatus` (the functions exist, unauthenticated, in
 `orderService.js`), and country/state pickers beyond a short illustrative list.
+
+## 15. Mobile scroll performance
+
+Two real, measured contributors to mobile scroll jank, both fixed without touching the Hero's architecture
+(still canvas + GSAP ScrollTrigger, still `scrub: true`, still scroll-position-driven, never time-based):
+
+1. **Hero frames were desktop-resolution (1920×1080 JPEG) on every device.** The mobile canvas only ever
+   renders a fraction of that — a portrait band (`min(62svh, 128vw)`) or a DPR-capped landscape strip (see
+   `hero.css`) — so mobile was decoding and downscaling ~2.07MP source images it would never render at native
+   size. `scripts/generate-mobile-hero-frames.mjs` (needs the `sharp` devDependency) derives a parallel
+   `src/assets/video/hero-mobile/frames/` set from the existing desktop frames: same 210 frames, same order,
+   960×540 WebP at quality 70 (chosen empirically — quality 80 produced files *larger* than the source JPEGs on
+   this footage's fine metallic/diamond detail; 70 is the first step down that reliably beats it with no visible
+   loss). `useHeroFrames` (`hooks/useSectionMotion.js`) prefers `<id>-mobile` over `<id>` below 768px if one is
+   registered, falling back to the desktop set otherwise — generic to any frame sequence, not hero-specific.
+   Re-run the script whenever the desktop frame set changes. Measured: 47.8% smaller total payload (10.14MB →
+   5.30MB), ~25–30% faster combined decode+draw per frame in-browser (`createImageBitmap` + `drawImage` at the
+   real mobile canvas size).
+2. **The lamp glow's ambient animation never stopped.** `animations/primitives/pointer.js`'s `lampGlow()` starts
+   two infinite (`repeat: -1`) GSAP tweens — a "breathe" scale on every device, a slow drift on touch. `Hero.jsx`
+   never passed `useHeroIntro` an `onCovered` callback, so once a user scrolled past the Hero (three viewports
+   in), nothing ever told the lamp to stop: both tweens kept ticking forever in the background, on top of the
+   sticky-but-covered Hero, competing with every subsequent scroll for the rest of the page — on desktop too,
+   not just mobile. `lampGlow` now returns a `{ setCovered, teardown }` handle instead of a bare cleanup
+   function; `useHeroIntro` calls `setCovered(true/false)` from the same `onLeave`/`onEnterBack`/`onRefresh`
+   signal `heroExit` already computed (pre-existing, unmodified logic — this only adds a subscriber). Verified
+   the pause/resume mechanism directly against a live GSAP tween (`.pause()` held the value, `.resume()`
+   continued it); the actual lamp couldn't be observed animating in this project's automated browser tooling,
+   which runs with `prefers-reduced-motion: reduce` forced on (a real user's browser without that preference
+   set takes the branch that was leaking).
+
+Investigated and found **already correctly optimized, no change made**: canvas redraw is already guarded
+(`if (i !== drawn) draw(i)`), `devicePixelRatio` is already capped at 2, canvas resize is already
+`ResizeObserver`-driven rather than per-frame, `scrub: true` adds no GSAP-side lag, no frame-sequence state ever
+touches React (the canvas is drawn directly from GSAP's `onUpdate`, bypassing re-renders entirely), there are no
+raw `scroll`/`resize` listeners anywhere outside GSAP's own ScrollTrigger, every parallax/reveal tween animates
+`transform`/`opacity`/`clipPath` only (compositor-friendly, no layout thrashing) with `will-change` toggled on
+only while a ScrollTrigger is actually active, `backdrop-filter: blur()` is already gated to `≥1024px`, and
+product images already lazy-load with responsive AVIF/WebP/JPEG sources.

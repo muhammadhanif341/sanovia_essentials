@@ -58,16 +58,23 @@ export function useHeroIntro(scope, { exit = false, onCovered } = {}) {
       // something the hand-off should ever target.
       let next = exit ? root.nextElementSibling : null;
       while (next?.hasAttribute('data-hero-runway')) next = next.nextElementSibling;
-      const notify = (covered) => coveredRef.current?.(covered);
+      const glow = root.querySelector('[data-hero-glow]');
+      const glowHandle = reduce ? null : glow && lampGlow(glow, { follow: fine });
+      // The lamp's breathe/drift tweens are infinite — once the hero is fully covered by the
+      // next section it's invisible (still mounted underneath), so pause them rather than let
+      // them keep costing scroll-compositor work for the rest of the page. Reduced-motion never
+      // starts them in the first place, so there's nothing to pause there.
+      const notify = (covered) => {
+        glowHandle?.setCovered(covered);
+        coveredRef.current?.(covered);
+      };
       if (reduce) {
         heroCoverWatch(next, notify);
         return undefined;
       }
       heroIntro(root);
       heroExit(root, next, { onCovered: notify });
-      const glow = root.querySelector('[data-hero-glow]');
-      if (glow) return lampGlow(glow, { follow: fine });
-      return undefined;
+      return glowHandle?.teardown;
     },
     { scope }
   );
@@ -91,6 +98,13 @@ export function useHeroIntro(scope, { exit = false, onCovered } = {}) {
  * see hero.css's architecture note on why the scroll runway is a sibling, not a height hack)
  * kept for anything that wants to key off "the real sequence is running" (e.g. debugging).
  *
+ * Below `768px` this prefers a `<id>-mobile` frame set (e.g. `src/assets/video/hero-mobile/
+ * frames/`) over `<id>` if one is registered — same frame count/order, just a much smaller
+ * source resolution, since the canvas itself renders far smaller on mobile (a portrait band or
+ * a capped-DPR landscape strip — see hero.css/frameSequence.js) and decoding/drawing full desktop-
+ * resolution frames there was the dominant cause of mobile scroll jank. Falls back to `<id>` if
+ * no mobile-specific set exists, so this is safe to use for any frame sequence, not just Hero's.
+ *
  * @param {object} [o]
  * @param {string} [o.id]        frame sequence id → src/assets/video/<id>/frames/*
  * @param {string} [o.stillId]   Picture id shown instead, ONLY if no frames are registered
@@ -102,7 +116,14 @@ export function useHeroFrames({ id = 'hero', stillId = 'editorial/hero-hold' } =
   const wrapperRef = useRef(null);
   const canvasRef = useRef(null);
   const runwayRef = useRef(null);
-  const urls = useMemo(() => getFrameSequence(id), [id]);
+  const urls = useMemo(() => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (isMobile) {
+      const mobile = getFrameSequence(`${id}-mobile`);
+      if (mobile.length > 1) return mobile;
+    }
+    return getFrameSequence(id);
+  }, [id]);
   const active = urls.length > 1;
 
   useMotion(

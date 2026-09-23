@@ -62,25 +62,48 @@ export function cursorFollow(el, host) {
  * The "lamp": a warm radial light that follows the cursor inside `el`'s parent
  * (fine pointer) or drifts slowly on its own (touch). Both breathe gently.
  * See DESIGN-BLUEPRINT §1.2 — the lamp-glow motif from the reference reel.
+ *
+ * The breathe/drift tweens are infinite (`repeat: -1`) by design — but that means they'd
+ * otherwise keep ticking forever once the lamp scrolls out of view (e.g. the Hero's lamp,
+ * still mounted underneath the sheet that covers it), costing main-thread/compositor work on
+ * every subsequent scroll for no visible result. Callers that can detect "now hidden" should
+ * call `setCovered(true)`/`(false)` on the returned handle rather than let it run unseen.
+ *
+ * @returns {{ setCovered: (covered: boolean) => void, teardown: () => void }}
  */
 export function lampGlow(el, { follow = true } = {}) {
   const area = el.parentElement;
   gsap.set(el, { xPercent: -50, yPercent: -50 });
 
-  gsap.to(el, { scale: 1.08, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+  const breathe = gsap.to(el, { scale: 1.08, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+  let drift = null;
+  let onMove = null;
 
   if (!follow) {
-    gsap.to(el, { x: 40, y: -30, duration: 12, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-    return undefined;
+    drift = gsap.to(el, { x: 40, y: -30, duration: 12, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+  } else {
+    const xTo = gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3' });
+    const yTo = gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power3' });
+    onMove = (e) => {
+      const r = area.getBoundingClientRect();
+      xTo(e.clientX - r.left - r.width / 2);
+      yTo(e.clientY - r.top - r.height / 2);
+    };
+    area.addEventListener('pointermove', onMove);
   }
 
-  const xTo = gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3' });
-  const yTo = gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power3' });
-  const onMove = (e) => {
-    const r = area.getBoundingClientRect();
-    xTo(e.clientX - r.left - r.width / 2);
-    yTo(e.clientY - r.top - r.height / 2);
+  return {
+    setCovered(covered) {
+      if (covered) {
+        breathe.pause();
+        drift?.pause();
+      } else {
+        breathe.resume();
+        drift?.resume();
+      }
+    },
+    teardown() {
+      if (onMove) area.removeEventListener('pointermove', onMove);
+    },
   };
-  area.addEventListener('pointermove', onMove);
-  return () => area.removeEventListener('pointermove', onMove);
 }
