@@ -94,7 +94,7 @@ export default function Account() {
                 the record.
               </Text>
               <div>
-                <Button href={whatsappLink()} external variant="whatsapp" iconBefore={<WhatsApp size={18} />}>
+                <Button href={whatsappLink()} external iconBefore={<WhatsApp size={18} />}>
                   Message us on WhatsApp
                 </Button>
               </div>

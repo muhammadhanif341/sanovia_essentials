@@ -50,7 +50,7 @@ export function Newsletter() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Button type="submit" variant="whatsapp" className="newsletter__submit" iconBefore={<WhatsApp size={18} />}>
+            <Button type="submit" className="newsletter__submit" iconBefore={<WhatsApp size={18} />}>
               Join on WhatsApp
             </Button>
           </div>

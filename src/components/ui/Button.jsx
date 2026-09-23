@@ -8,9 +8,7 @@ import './controls.css';
  *   <Button to="/shop">         → router link (with page transition)
  *   <Button href="https://…" external>  → <a>, opens in a new tab, announced as such
  *
- * variant: 'primary' | 'ghost' | 'whatsapp'      size: 'sm' | 'md' | 'lg'      block: full width
- * 'whatsapp' is the fixed WhatsApp brand green (tokens.css) — use it for every WhatsApp CTA,
- * never 'primary'/'ghost' (which render in the site's own gold accent).
+ * variant: 'primary' | 'ghost'      size: 'sm' | 'md' | 'lg'      block: full width
  * `loading` sets aria-busy and blocks interaction; `disabled` uses the native attribute.
  * `ref` is a plain prop (React 19).
  */

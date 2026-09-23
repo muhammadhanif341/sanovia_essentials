@@ -79,7 +79,7 @@ export default function Drop() {
                 moment this one lands.
               </Text>
               <div className="sv-cluster">
-                <Button href={whatsappLink(`Hi Sanovia! Let me know when Drop ${drop} is available.`)} external variant="whatsapp" iconBefore={<WhatsApp size={18} />}>
+                <Button href={whatsappLink(`Hi Sanovia! Let me know when Drop ${drop} is available.`)} external iconBefore={<WhatsApp size={18} />}>
                   Get notified on WhatsApp
                 </Button>
                 <Button to="/shop" variant="ghost">

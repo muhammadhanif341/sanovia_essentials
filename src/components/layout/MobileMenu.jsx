@@ -152,7 +152,7 @@ function MenuBody({ open, onClose, onSearch, closeRef }) {
 
       <div className="sv-menu__foot">
         <div data-menu-extra>
-          <Button href={whatsappLink()} external variant="whatsapp" iconBefore={<WhatsApp size={18} />}>
+          <Button href={whatsappLink()} external iconBefore={<WhatsApp size={18} />}>
             Order on WhatsApp
           </Button>
         </div>
