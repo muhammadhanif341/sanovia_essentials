@@ -16,7 +16,7 @@ export function ReviewList({ product }) {
         <p className="t-body t-muted">
           This piece hasn't been reviewed yet. First-hand? We only publish reviews with consent.
         </p>
-        <Button href={whatsappLink(`Hi Sanovia! I have a question about the ${product.name}.`)} external variant="whatsapp" size="sm" iconBefore={<WhatsApp size={16} />}>
+        <Button href={whatsappLink(`Hi Sanovia! I have a question about the ${product.name}.`)} external variant="ghost" size="sm" iconBefore={<WhatsApp size={16} />}>
           Ask us on WhatsApp
         </Button>
       </div>

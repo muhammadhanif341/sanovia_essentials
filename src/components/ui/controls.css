@@ -52,12 +52,6 @@
   background: var(--btn-bg);
   color: var(--btn-fg);
 }
-/* WhatsApp CTAs only — fixed brand green, not surface-dependent (see tokens.css). */
-.sv-btn--whatsapp {
-  --_hover-bg: var(--whatsapp-green-dark);
-  background: var(--whatsapp-green);
-  color: #fff;
-}
 .sv-btn--ghost {
   --_hover-bg: var(--accent);
   border-color: var(--accent-ui);

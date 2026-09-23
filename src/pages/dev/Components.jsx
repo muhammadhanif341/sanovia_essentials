@@ -32,7 +32,7 @@ export function ControlsSection() {
             <Button>Primary</Button>
             <Button variant="ghost">Ghost</Button>
             <Button iconAfter={<ArrowRight size={16} />}>With icon</Button>
-            <Button variant="whatsapp" iconBefore={<WhatsApp size={18} />}>WhatsApp</Button>
+            <Button iconBefore={<WhatsApp size={18} />}>WhatsApp</Button>
             <Button loading>Loading</Button>
             <Button disabled>Disabled</Button>
           </div>

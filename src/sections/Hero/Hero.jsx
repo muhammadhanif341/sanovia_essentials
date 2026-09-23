@@ -95,7 +95,7 @@ export function Hero() {
                   </Magnetic>
                 </div>
                 <div data-hero-cta>
-                  <Button href={whatsappLink()} external variant="whatsapp" iconBefore={<WhatsApp size={18} />}>
+                  <Button href={whatsappLink()} external variant="ghost" iconBefore={<WhatsApp size={18} />}>
                     Order on WhatsApp
                   </Button>
                 </div>

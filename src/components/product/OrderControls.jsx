@@ -39,7 +39,7 @@ export function AddToOrderList({ product, variant, qty = 1, size = 'md', variant
 }
 
 /** One-tap order: opens WhatsApp with a prefilled message. The PDP's "buy now" — no cart detour. */
-export function OrderOnWhatsApp({ product, variant, qty = 1, label = 'Order on WhatsApp', size = 'md', block, variantStyle = 'whatsapp' }) {
+export function OrderOnWhatsApp({ product, variant, qty = 1, label = 'Order on WhatsApp', size = 'md', block, variantStyle = 'primary' }) {
   return (
     <Button
       variant={variantStyle}

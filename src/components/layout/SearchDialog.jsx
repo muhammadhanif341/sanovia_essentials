@@ -94,7 +94,7 @@ export function SearchDialog({ open, onClose }) {
             </p>
             <p className="t-small t-muted">Tell us what you are looking for and we will help you find a piece.</p>
             <div>
-              <Button href={whatsappLink()} external variant="whatsapp" size="sm" iconBefore={<WhatsApp size={18} />}>
+              <Button href={whatsappLink()} external variant="ghost" size="sm" iconBefore={<WhatsApp size={18} />}>
                 Ask on WhatsApp
               </Button>
             </div>
