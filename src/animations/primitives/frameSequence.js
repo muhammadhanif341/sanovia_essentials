@@ -19,10 +19,22 @@
  * real frame instead of flashing blank canvas — it never invents a frame that hasn't arrived,
  * which is what keeps this flicker-free without gating all interaction behind a spinner.
  *
- * `scrub` (a number, not `true`) gives GSAP's own catch-up smoothing on `self.progress` even
- * though there is no attached tween/timeline — the documented, canonical way to pair
- * ScrollTrigger with a canvas draw loop. That smoothing is what keeps the discrete frame swap
- * reading as continuous motion rather than a slideshow at a moderate frame count.
+ * `scrub` is `true` (zero-lag), not a number, and that's load-bearing, not a style choice. The
+ * hand-off that follows (`<BrandIntro/>`'s sheet rising over the hero, `animations/hero.js`
+ * heroExit) is driven by plain CSS scroll position — instant, no easing — and its entrance
+ * point is deliberately built to land at EXACTLY the same raw scrollY where this sequence's
+ * own range ends (see hero.css's architecture note). A `scrub: <number>` here would add
+ * GSAP's own catch-up EASING on top of that raw position, so `self.progress` — and therefore
+ * the drawn frame — would lag behind raw scroll by roughly `scrub` seconds × scroll speed.
+ * During any real (non-instant) scroll, that lag is enough for the sheet to already be rising
+ * into view while the canvas is still catching up to the final frame — confirmed by measurement:
+ * jumping 300px past the sequence's raw end point showed the sheet 300px into the viewport
+ * while the canvas was still painting the CLOSED frame, not catching up to the open one for
+ * another ~1s. `scrub: true` ties frame index to raw scroll 1:1, the same way the sheet's own
+ * entrance is, so the two can never diverge — the sequence is provably fully open by the exact
+ * scrollY the sheet can first become visible, at any scroll speed. The frame density (185
+ * frames over the runway's full length) is what keeps this reading as continuous motion
+ * instead of a slideshow, not eased catch-up.
  *
  * @param {HTMLElement} wrapper
  * @param {HTMLCanvasElement} canvas
@@ -32,12 +44,12 @@
  * @param {number} [o.focalX=0.5]   cover-fit anchor, 0–1
  * @param {number} [o.focalY=0.5]
  * @param {number} [o.concurrency=6]
- * @param {number} [o.scrub=0.35]
+ * @param {number|boolean} [o.scrub=true]
  * @returns {() => void} teardown
  */
 import { ScrollTrigger } from '../register';
 
-export function initFrameSequence(wrapper, canvas, runway, urls, { focalX = 0.5, focalY = 0.5, concurrency = 6, scrub = 0.35 } = {}) {
+export function initFrameSequence(wrapper, canvas, runway, urls, { focalX = 0.5, focalY = 0.5, concurrency = 6, scrub = true } = {}) {
   if (!wrapper || !canvas || !runway || !urls.length) return () => {};
 
   const ctx = canvas.getContext('2d');
