@@ -687,3 +687,59 @@ exact bug couldn't be reproduced pixel-for-pixel here. What was verified: `scrol
 post-fix; rapid synthetic scroll bursts are clean and monotonic with no reset; the Hero's scroll-scrubbed frame
 sequence, the fixed header's hide/show, and all four intentional `behavior: 'smooth'` interactions still work
 exactly as before; zero console errors; `npm run check` green.
+
+## 17. Placeholder-content audit — About, Drop, and the editorial/social imagery left out of §13
+
+A full pass over every route looking for unfinished/placeholder content (product data and photography were
+already real as of §12/§13 — this pass covers what wasn't).
+
+**Fixed:**
+- **`pages/Story.jsx` (`/about`)** — was a single line, "The story page arrives in Phase 3." Replaced with the
+  founder-note + packing-story content `BrandStory.jsx`'s homepage teaser already promises: how pieces are
+  chosen, how orders are packed, and a WhatsApp/Instagram/Shop CTA. Voice matches the existing "kitchen table"
+  motif already live on the homepage — nothing here contradicts previously-established copy.
+- **`pages/Drop.jsx` (`/drops/:drop`)** — was a single line, "The editorial page for this drop arrives in Phase
+  3," for every drop including `01`, which already has 4 real products (`data/products.js`). Rebuilt as a real
+  editorial hero (reuses `editorial/drop-01-hero`) + `<ProductGrid>` of that drop's pieces. A drop number with no
+  matching products (e.g. `/drops/02`) now shows an honest "hasn't launched yet" state with a WhatsApp CTA,
+  instead of a generic phase-timeline placeholder — same honesty convention as the Shop empty state.
+- **`pages/Collections.jsx`** — was one line of stale copy ("arrive with the photography" — it already had, per
+  §13) plus a single "Drop 01" button. Rebuilt as a real grid of every working way to browse the catalogue today
+  (Drop 01, Watches, Jewellery, Best Sellers, New Arrivals), each with real photography and a real route. No
+  collection name was invented that isn't backed by a real, working view.
+- **`sections/CollectionShowcase/CollectionShowcase.jsx`** — the 5 nav cards (Watches / Jewellery / Drop 01 /
+  Collections / About) had `id={null}` **by design** (§13 explicitly scoped these out as "not product
+  photography"). Since this pass's brief was specifically about closing exactly these gaps, each now points at
+  real photography: a signature piece per category, `editorial/drop-01-hero`, and the new lifestyle still below.
+- **`sections/BrandStory/BrandStory.jsx`** — `lifestyle/packing-table` was a declared id with no file (§13 also
+  scoped this out). One image was generated (Cloudinary, FLUX.2 Klein 9B, same pipeline as §13's product
+  photography) from a prompt matching the section's own `placeholderSpec`: "hands wrapping an order, wood table,
+  lamp glow" — no visible face, warm/editorial, consistent with §13's styling rules. Resized/compressed with
+  `sharp` to 1200w JPEG (~170 KB, in line with the product-image budget) and saved to
+  `src/assets/images/lifestyle/packing-table.jpg`. Reused as-is on the new About page (same id, same shot).
+- **`sections/Social/Social.jsx`** — the 6-tile "on the table" strip resolved `social/on-the-table-1..6`, none of
+  which had files (§13 scoped this out too). Rather than generating a separate photoshoot, it now points at 6
+  existing product `worn`/`wrist`/`detail` shots across both categories — real catalogue photography styled as
+  the candid angle a brand's own feed would actually post, not a fabricated customer-lifestyle claim (that
+  distinction matters here: `Reviews.jsx` still shows zero invented reviews/testimonials, on purpose — see its
+  own comment. A brand posting its own product photos to its own feed isn't the same claim as a fake customer
+  quote, so this was in scope while inventing reviews still isn't).
+
+**Deliberately left alone (not placeholders, or not mine to invent):**
+- `data/shipping.js`, `data/tax.js`, `Help.jsx` — real, working demo values (rates, thresholds, a 0% tax rule),
+  explicitly flagged TBC-with-client in their own comments. These are operational/financial claims, not copy —
+  inventing a shipping rate or a tax rule the client didn't set would be a different kind of problem than an
+  empty product card.
+- `sections/Reviews/Reviews.jsx` — still zero invented reviews. Unchanged, on purpose (see the file's own
+  comment): fabricating a customer quote is not the same category of gap as a missing product photo.
+- `components/media/Logo.jsx` — a working, on-brand typographic wordmark (not a "LOGO HERE" box), explicitly
+  documented as a stand-in for a real designed mark. A logo is a brand-identity deliverable, not a data/photo
+  gap this pass covers.
+- `data/placeholders.js` — dev-only fixtures for `/design-system`, already documented as never shipping to a
+  production route; confirmed still true (only `pages/dev/Components.jsx` imports it).
+
+**Verified:** `npm run check` (contrast, lint, build) green. Manually checked in-browser at mobile (414px) and
+true desktop (1280px) width: `/about`, `/drops/01`, `/drops/02` (empty-drop state), `/collections`, `/` (Collection
+Showcase + Social strip), `/shop/jewellery`. Zero console errors on any route. No product/category/search/filter
+logic touched — this pass only added content and 5 image references, all resolved through the existing
+`utils/media.js` registry with no code changes to it.

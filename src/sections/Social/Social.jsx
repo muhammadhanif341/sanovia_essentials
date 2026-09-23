@@ -11,15 +11,25 @@ import './social.css';
 // not a uniform grid. Below that every tile is a plain 2-up row (see social.css).
 const SPANS = [6, 3, 3, 3, 3, 6];
 
-const TILES = Array.from({ length: SPANS.length }, (_, i) => ({
-  id: `social/on-the-table-${i + 1}`,
-  span: SPANS[i],
-}));
+// Real catalogue photography (worn/detail shots read more "on the table"/lifestyle than the
+// plain front-facing product card crop), not a dedicated Instagram shoot — see
+// docs/ARCHITECTURE.md §13 for why stand-in social photography wasn't generated: these are the
+// same real Sanovia pieces, just the candid angle a brand's own feed would actually post.
+const TILE_IDS = [
+  'products/tonneau-signature-watch/wrist',
+  'products/layered-chain-necklace/worn',
+  'products/huggie-hoop-earrings/worn',
+  'products/cuff-bracelet/worn',
+  'products/signet-ring/worn',
+  'products/circle-rose-gold-watch/wrist',
+];
+
+const TILES = TILE_IDS.map((id, i) => ({ id, span: SPANS[i] }));
 
 /**
- * Social / Instagram — real handle, real link; the photography is a placeholder grid
- * until stills are supplied (DESIGN-BLUEPRINT: "on the table" strip). Motion: image reveal,
- * each tile wiping in on a small hand-placed stagger (data-reveal-delay).
+ * Social / Instagram — real handle, real link, real catalogue photography styled as the
+ * "on the table" strip (DESIGN-BLUEPRINT). Motion: image reveal, each tile wiping in on a
+ * small hand-placed stagger (data-reveal-delay).
  */
 export function Social() {
   return (

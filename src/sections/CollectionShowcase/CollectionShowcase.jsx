@@ -8,11 +8,11 @@ import './collectionShowcase.css';
 
 
 const STOPS = [
-  { to: '/shop/watches', label: 'Watches', shape: 'tonneau', copy: 'Small-face cases for every day.' },
-  { to: '/shop/jewellery', label: 'Jewellery', shape: 'oval', copy: 'Layered chains and thin gold-tone bands.' },
-  { to: '/drops/01', label: 'Drop 01', shape: 'arch', copy: 'The first curated drop.' },
-  { to: '/collections', label: 'Collections', shape: 'rect', copy: 'Every way to browse Sanovia.' },
-  { to: '/about', label: 'About', shape: 'pill', copy: 'How we choose and pack each piece.' },
+  { to: '/shop/watches', label: 'Watches', shape: 'tonneau', copy: 'Small-face cases for every day.', id: 'products/tonneau-signature-watch/front' },
+  { to: '/shop/jewellery', label: 'Jewellery', shape: 'oval', copy: 'Layered chains and thin gold-tone bands.', id: 'products/layered-chain-necklace/front' },
+  { to: '/drops/01', label: 'Drop 01', shape: 'arch', copy: 'The first curated drop.', id: 'editorial/drop-01-hero' },
+  { to: '/collections', label: 'Collections', shape: 'rect', copy: 'Every way to browse Sanovia.', id: 'products/circle-rose-gold-watch/front' },
+  { to: '/about', label: 'About', shape: 'pill', copy: 'How we choose and pack each piece.', id: 'lifestyle/packing-table' },
 ];
 
 /**
@@ -38,7 +38,7 @@ export function CollectionShowcase() {
         {STOPS.map((s) => (
           <TransitionLink key={s.to} to={s.to} className="showcase__card">
             <ShapeMedia
-              id={null}
+              id={s.id}
               shape={s.shape}
               ratio={s.shape === 'oval' ? '1 / 1' : '4 / 5'}
               tone="cream"
