@@ -32,9 +32,10 @@
  * while the canvas was still painting the CLOSED frame, not catching up to the open one for
  * another ~1s. `scrub: true` ties frame index to raw scroll 1:1, the same way the sheet's own
  * entrance is, so the two can never diverge — the sequence is provably fully open by the exact
- * scrollY the sheet can first become visible, at any scroll speed. The frame density (185
- * frames over the runway's full length) is what keeps this reading as continuous motion
- * instead of a slideshow, not eased catch-up.
+ * scrollY the sheet can first become visible, at any scroll speed. The frame density (currently
+ * 210 frames over the runway's full length — see Hero.jsx's own comment for the source and
+ * trim reasoning) is what keeps this reading as continuous motion instead of a slideshow, not
+ * eased catch-up.
  *
  * @param {HTMLElement} wrapper
  * @param {HTMLCanvasElement} canvas

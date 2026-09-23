@@ -32,12 +32,15 @@ import './hero.css';
  *            this — `useHeroIntro` below just skips the runway when it looks for "the next
  *            section" (hooks/useSectionMotion.js).
  *
- * The frame set (`src/assets/video/hero/frames/frame-001.jpg` … `frame-185.jpg`) is already
- * trimmed to just the closed→open half of the client-supplied 300-frame clip: the source footage
- * is a closed → open → closed LOOP (settles open ~frame 130–190, fully reassembled again by
- * ~frame 220), so frames past 185 are simply not shipped — using them would mean scrolling to
- * the end of the Hero shows a closed watch again, not open. Reverse playback (closing) comes for
- * free from scrolling back up through this same 185-frame range.
+ * The frame set (`src/assets/video/hero/frames/frame-001.jpg` … `frame-210.jpg`) is already
+ * trimmed to just the closed→open half of the client-supplied 300-frame "Google Flow" clip: the
+ * source footage is a closed → open(-hold) → closed → labelled-callout-graphic LOOP (settles
+ * open/exploded ~frame 75–210, visibly reassembling by ~frame 220, and the final ~10 frames are
+ * a text-labelled marketing composite, not a continuation of the physical animation) — so only
+ * frames 1–210 are shipped. Using frames past 210 would mean scrolling to the end of the Hero
+ * either shows a closing watch or a labelled infographic, neither of which is the intended
+ * "fully open" payoff. Reverse playback (closing) comes for free from scrolling back up through
+ * this same 210-frame range.
  *
  * The frame sequence itself is NOT gated on reduced motion or Save-Data — it's the product
  * animation, not decorative chrome, per the client's explicit brief (see useHeroFrames' own
