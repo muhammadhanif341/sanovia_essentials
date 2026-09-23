@@ -129,7 +129,7 @@ export default function OrderConfirmation() {
           <div className="sv-confirmation-actions">
             <Button to="/shop">Continue shopping</Button>
             <Button
-              variant="ghost"
+              variant="whatsapp"
               href={whatsappLink(`Hi Sanovia! I have a question about my order ${order.orderNumber}.`)}
               external
               iconBefore={<WhatsApp size={18} />}

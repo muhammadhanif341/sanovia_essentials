@@ -96,7 +96,7 @@ export default function Story() {
               </Text>
             </div>
             <Cluster gap="var(--space-3)">
-              <Button href={whatsappLink()} external iconBefore={<WhatsApp size={18} />}>
+              <Button href={whatsappLink()} external variant="whatsapp" iconBefore={<WhatsApp size={18} />}>
                 Message us on WhatsApp
               </Button>
               <Button href={site.instagram.url} external variant="ghost" iconBefore={<Instagram size={18} />}>

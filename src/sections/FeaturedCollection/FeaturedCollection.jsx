@@ -66,7 +66,7 @@ export function FeaturedCollection() {
                   <Button
                     href={whatsappLink("Hi Sanovia! Let me know when Drop 01 is available.")}
                     external
-                    variant="ghost"
+                    variant="whatsapp"
                     iconBefore={<WhatsApp size={18} />}
                   >
                     Get notified on WhatsApp

@@ -105,7 +105,7 @@ export function OrderListDrawer() {
                 <Button
                   href={whatsappLink('Hi Sanovia! I have a question about my cart.')}
                   external
-                  variant="ghost"
+                  variant="whatsapp"
                   size="sm"
                   iconBefore={<WhatsApp size={16} />}
                 >
