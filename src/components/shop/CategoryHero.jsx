@@ -59,7 +59,7 @@ export function CategoryHero({ category, count }) {
       <Container>
         <Grid className="sv-cat-hero__grid">
           {category === 'watches' ? (
-            <GridItem span={{ base: 4, md: 8, lg: 7 }} row={{ lg: 1 }} className="sv-cat-hero__media">
+            <GridItem span={{ base: 4, md: 6, lg: 4 }} start={{ md: 2, lg: 3 }} row={{ lg: 1 }} className="sv-cat-hero__media">
               <ShapeMedia
                 id={pieces[0]?.images?.primary}
                 shape="tonneau"
@@ -85,7 +85,7 @@ export function CategoryHero({ category, count }) {
                   alt={pieces[0]?.name ?? 'A Sanovia jewellery piece'}
                 />
               </GridItem>
-              <GridItem span={{ base: 2, md: 4, lg: 3 }} start={{ lg: 8 }} row={{ lg: 1 }} className="sv-cat-hero__media sv-cat-hero__media--b">
+              <GridItem span={{ base: 2, md: 4, lg: 3 }} start={{ lg: 9 }} row={{ lg: 1 }} className="sv-cat-hero__media sv-cat-hero__media--b">
                 <ShapeMedia
                   id={pieces[1]?.images?.primary}
                   shape="arch"
@@ -103,7 +103,7 @@ export function CategoryHero({ category, count }) {
 
           <GridItem
             span={{ base: 4, md: 8, lg: 4 }}
-            start={{ lg: category === 'watches' ? 9 : 1 }}
+            start={{ lg: category === 'watches' ? 8 : 1 }}
             row={{ lg: 1 }}
             className="sv-cat-hero__copy"
           >
