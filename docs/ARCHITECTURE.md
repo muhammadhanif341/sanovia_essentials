@@ -388,3 +388,106 @@ localStorage state was cleared before finishing.
 **Not changed:** any visual token, layout, copy, or the hand-tuned timing/easing of the existing hero/menu/header
 choreography — it was already built to DESIGN-BLUEPRINT §7 and re-timing it without a concrete defect would be
 redesign, not polish, which the brief explicitly ruled out.
+
+## 12. Phase 7 — product catalogue + admin-ready service layer
+
+The brief: `data/products.js` had shipped intentionally empty since Phase 5 — every product screen was built and
+verified against a temporary, never-committed fixture set, then reverted (§10). This phase populates it with a
+real, professionally-written 16-product demo catalogue, and — the more consequential half of the brief — inserts
+a service layer between it and every UI component, so a future Admin Portal (or any real backend) can replace the
+data source without any component changing. No visual system, copy outside product content, navigation, or the
+Hero/animation work changed.
+
+**The service layer** (`services/productRepository.js`, new): every product query a screen needs —
+`getProduct(slug)`, `getProductsByCategory`, `getProductsByDrop`, `getFeaturedProducts`, `getBestsellers`,
+`getNewArrivals`, `getRelatedProducts`, `searchProducts`, `SHOP_VIEWS`, `availabilityMeta` — is a named function
+here now, not an inline `.filter()` scattered across component files. `data/products.js` is the data SOURCE (today
+a static array); the repository is the SERVICE that sits between it and the UI:
+
+```
+UI components (Shop.jsx, ProductCard.jsx, sections/…)
+      ↓ import from
+services/productRepository.js
+      ↓ reads
+data/products.js   (today: a static array — tomorrow: a real API/DB call, same function signatures)
+```
+
+All 12 components that previously imported `data/products.js` directly (`Shop.jsx`, `Product.jsx`,
+`ProductCard.jsx`, `QuickView.jsx`, `Wishlist.jsx`, `SearchDialog.jsx`, `BestSellers.jsx`, `SignatureWatches.jsx`,
+`JewelleryEditorial.jsx`, `FeaturedCollection.jsx`) now import from the repository instead — a mechanical,
+same-signature change, plus three real cleanups the brief asked for directly: `BestSellers.jsx` and
+`FeaturedCollection.jsx` re-implemented their own inline filters (`products.filter(p => p.tag === 'Most asked
+for')`, `products.filter(p => p.drop === '01')`) instead of calling a shared query — now call
+`getBestsellers()` / `getProductsByDrop('01')`; `SearchDialog.jsx` likewise now calls `searchProducts()`.
+`data/products.js` itself is no longer imported by any UI file — only the repository touches it.
+
+**Product model** (`data/products.js`): the typedef grew `id` (stable, independent of `slug` — a future DB
+primary key), `subcategory`, `compareAtPrice`, `sku`, `stock`, `featured`, `bestseller` (replacing the
+`tag === 'Most asked for'` string match with a real boolean — `tag` still exists, now purely display text),
+`thumbnail`, `shortDescription`, `specifications`, `createdAt`/`updatedAt`. `isNew` and `availability` were kept
+as-is rather than renamed to the brief's `newArrival`/`available` — they already are that field, already fully
+wired through every screen, and renaming working code for a label match isn't a functional change.
+`compareAtPrice` is real, not decorative: `components/product/Price.jsx` only renders the struck-through "was"
+price when it's actually greater than the current price. `specifications` renders as a definition list in the
+PDP's existing "Details" accordion tab (`pages/Product.jsx`) — no new tab, no layout change. `sku` renders as a
+small line under the price. Every rated product's `rating.count` is held equal to its `reviews.length` — this
+catalogue never shows a review count it doesn't back with real review text (same "no invented social proof"
+principle as `getBestSellers`/reviews always did); products without written reviews get `rating: null` ("No
+reviews yet"), not a fabricated average.
+
+**The 16 demo products** (8 watches, 8 jewellery) are written in the brand's established voice — grounded,
+specific, no "experience luxury like never before" copy — spanning every `availability` state, 4 in Drop 01, 5
+flagged `bestseller`, 4 `isNew`, 4 `featured`, 3 with a real `compareAtPrice` discount, 4 with real written
+reviews (ratings elsewhere are honestly `null`). Product **images deliberately still resolve to the existing
+`MediaPlaceholder` system**, not fabricated photography: every product's `images.*` ids follow the real,
+documented `products/<slug>/<view>` convention (`assets/README.md`) so real photography drops in later with zero
+code changes, but no id currently resolves to a file, same honest "Photo needed" treatment as every other
+un-photographed surface on this site — this was a deliberate choice, not an oversight; see the hand-off note at
+the end of this section.
+
+**Admin mutations — intentionally not implemented.** `productRepository.js` exports `createProduct`,
+`updateProduct`, `deleteProduct`, `setProductPublished` with the exact signatures an Admin Portal's
+product-management screens would call — every one of them throws, on purpose, rather than mutating the in-memory
+array. A function that "saves" to a JS array that resets on every page refresh, with no auth check, visible to
+any visitor with devtools open, is a decorative admin panel wearing a real one's clothes — the brief explicitly
+ruled this out ("Do NOT pretend that a local frontend-only admin login is secure"). **No `/admin` route, login
+page, or dashboard UI was built.** What's actually required before one can be, in order:
+
+1. **A real backend** — Supabase/Firebase/a custom API + Postgres or similar. The product shape above (a flat
+   object per product, string/number/boolean/array fields, no client-only state) maps directly onto a single
+   `products` table/collection; no redesign of the model is needed to persist it.
+2. **Authenticated write access** — an API route or database rule that only an authenticated admin session can
+   call, never the public anon key/client alone. Session/JWT/cookie-based, verified server-side.
+3. **An admin login flow** — real credential auth (Supabase Auth, NextAuth-equivalent, or a custom email+password
+   + session), not a client-side password check against a hardcoded value.
+4. **Protected admin routes** — a route guard that checks a verified server-side session before rendering any
+   product-management UI, redirecting unauthenticated visitors; this app's public routes (`routes.jsx`) have no
+   such concept today and none should be added without #2/#3 existing first.
+5. **Image upload + storage** — `images.primary/hover/gallery` are currently registry ids resolved at *build*
+   time from files already in the repo (`utils/media.js`); an admin "upload a product photo" flow needs real file
+   storage (S3/Supabase Storage/Cloudinary/etc.) serving at *runtime*, which `utils/media.js`'s
+   `import.meta.glob` approach cannot do — this is a second, separate integration from the product data API.
+6. Once 1–5 exist, `productRepository.js`'s query functions become `async` (real I/O isn't synchronous) and each
+   consuming component gains a loading/error state around its call — see the file's own top-of-file comment for
+   exactly which functions and what changes; the function names, shapes and filtering semantics were already
+   designed to match what a real API should expose, so this is mechanical, not a rewrite.
+
+**Verified:** every populated section (Featured Collection, Signature Watches, Jewellery Editorial, Best Sellers,
+Shop grid + all four category/segment views, header search, PDP + related products, Wishlist, Quick View, cart)
+confirmed live against the real 16-product catalogue — correct counts, correct filtering/sorting (price
+ascending/descending, unpriced-last logic untriggered since every demo product is priced), correct
+compareAtPrice strikethrough, correct disabled "Add to cart" on the four non-orderable pieces, correct SKU/
+specifications/reviews on the PDP, correct category-scoped related products, wishlist/cart correctly capturing
+the selected variant and quantity. Zero console errors across every route, both desktop and mobile viewports, no
+horizontal overflow. The Hero frame sequence (unrelated to this phase) reverified unaffected. `npm run check`
+green (contrast, lint, build).
+
+**Hand-off note on photography:** this phase's brief asked for "temporary imagery consistent with the brand" if
+real photography is missing. This codebase has repeatedly, deliberately never used stock or fabricated
+photography for products (`components/media/MediaPlaceholder.jsx`'s own comment: "Stock photography is
+deliberately not used: it would misrepresent the products") — inventing photo-realistic images of watches and
+jewellery that don't exist, presented as if they were real Sanovia pieces, would be exactly that. The existing,
+already-verified `MediaPlaceholder` treatment (a labelled, on-brand card naming the exact shot needed) was used
+instead for all 16 products' imagery. If real photography should be generated (AI-rendered or stock) as a
+stand-in despite that established stance, that is a deliberate brand-presentation decision for the client to
+make explicitly, not one to default into.

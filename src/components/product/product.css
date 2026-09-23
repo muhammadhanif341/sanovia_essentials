@@ -175,6 +175,9 @@
 
 /* ---- Price ---------------------------------------------------------------------- */
 .sv-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
   font: 500 1rem / 1 var(--font-body);
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
@@ -184,6 +187,15 @@
   color: var(--fg-muted);
   font-weight: 400;
   font-size: var(--text-small);
+}
+/* The struck-through "was" price — a real discount signal (Price.jsx only renders it when
+   compareAtPrice is actually greater than price), never decorative. */
+.sv-price__compare {
+  color: var(--fg-muted);
+  font-weight: 400;
+  font-size: 0.8em;
+  text-decoration: line-through;
+  text-decoration-color: var(--fg-muted);
 }
 
 /* ---- Grid: RECOMPOSED per breakpoint --------------------------------------------
@@ -425,7 +437,6 @@
   margin-top: var(--space-2);
 }
 .sv-qv__price {
-  display: block;
   margin-top: var(--space-2);
   font: 500 var(--text-h3) / 1 var(--font-display);
 }
@@ -548,15 +559,33 @@
   gap: var(--space-4);
 }
 .sv-pdp__price {
-  display: block;
   margin-top: var(--space-3);
   font: 500 var(--text-h2) / 1 var(--font-display);
+}
+.sv-pdp__sku {
+  display: block;
+  margin-top: var(--space-1);
 }
 .sv-pdp__rating {
   margin-top: var(--space-3);
 }
 .sv-pdp__desc {
   margin-top: var(--space-5);
+}
+.sv-pdp__specs {
+  display: grid;
+  gap: var(--space-2) var(--space-5);
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+}
+.sv-pdp__spec {
+  display: contents;
+}
+.sv-pdp__spec dt {
+  grid-column: 1;
+}
+.sv-pdp__spec dd {
+  grid-column: 2;
+  margin: 0;
 }
 .sv-pdp__actions {
   display: grid;

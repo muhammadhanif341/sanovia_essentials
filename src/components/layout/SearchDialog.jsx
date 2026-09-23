@@ -4,7 +4,7 @@ import { Dialog } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { TransitionLink } from '@/components/motion/TransitionLink';
 import { Close, Search, WhatsApp } from '@/components/icons';
-import { products } from '@/data/products';
+import { getAllProducts, searchProducts } from '@/services/productRepository';
 import { primaryNav } from '@/data/navigation';
 import { whatsappLink } from '@/utils/whatsapp';
 import './chrome.css';
@@ -22,10 +22,7 @@ export function SearchDialog({ open, onClose }) {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
 
-  const results = useMemo(
-    () => (q ? products.filter((p) => `${p.name} ${p.category}`.toLowerCase().includes(q)).slice(0, 6) : []),
-    [q]
-  );
+  const results = useMemo(() => searchProducts(q, 6), [q]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -93,7 +90,7 @@ export function SearchDialog({ open, onClose }) {
         {q && results.length === 0 && (
           <div className="sv-stack" style={{ '--gap': 'var(--space-4)' }}>
             <p className="t-body-l">
-              {products.length === 0 ? 'The catalogue is on its way.' : `Nothing matches “${query.trim()}”.`}
+              {getAllProducts().length === 0 ? 'The catalogue is on its way.' : `Nothing matches “${query.trim()}”.`}
             </p>
             <p className="t-small t-muted">Tell us what you are looking for and we will help you find a piece.</p>
             <div>

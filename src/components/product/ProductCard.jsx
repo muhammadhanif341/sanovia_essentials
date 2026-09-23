@@ -5,7 +5,7 @@ import { ShapeMedia } from '@/components/media/ShapeMedia';
 import { TransitionLink } from '@/components/motion/TransitionLink';
 import { Tag } from '@/components/ui/Tag';
 import { Eye } from '@/components/icons';
-import { availabilityMeta } from '@/data/products';
+import { availabilityMeta } from '@/services/productRepository';
 import { useCursorFollow } from '@/hooks/useSectionMotion';
 import { Price } from './Price';
 import { AddToOrderList } from './OrderControls';
@@ -119,7 +119,7 @@ export function ProductCardBody() {
           <span className="sv-pcard__link-text">{product.name}</span>
         </TransitionLink>
       </h3>
-      <Price amount={product.price} />
+      <Price amount={product.price} compareAt={product.compareAtPrice} />
     </div>
   );
 }

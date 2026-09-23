@@ -95,8 +95,8 @@ const AVAILABILITY_SCHEMA = {
 /**
  * Per-product JSON-LD (Product + Offer + AggregateRating). `product` is nullable — the PDP calls
  * this unconditionally (not-found state clears any stale schema from a previous product).
- * Architecture only for now: `data/products.js` is empty until the client supplies real pieces,
- * so this has nothing to emit in production today — it activates the moment real data lands.
+ * Prefers `shortDescription` (a search-snippet-length line) over the long PDP `description`,
+ * same reasoning as `setPageMeta`'s description — falls back when a product has no short one.
  */
 export function setProductSchema(product) {
   if (!product) {
@@ -108,7 +108,7 @@ export function setProductSchema(product) {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    description: product.description || undefined,
+    description: product.shortDescription || product.description || undefined,
     category: product.category,
     url: absoluteUrl(`/product/${product.slug}`),
     offers:

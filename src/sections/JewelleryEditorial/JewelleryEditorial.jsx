@@ -2,7 +2,7 @@ import { Container, Grid, GridItem, Section } from '@/components/layout/primitiv
 import { Heading, Overline, Text } from '@/components/ui/Typography';
 import { TextLink } from '@/components/ui/TextLink';
 import { ShapeMedia } from '@/components/media/ShapeMedia';
-import { getProductsByCategory } from '@/data/products';
+import { getProductsByCategory } from '@/services/productRepository';
 import './jewelleryEditorial.css';
 
 /**

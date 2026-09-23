@@ -4,7 +4,7 @@ import { TextLink } from '@/components/ui/TextLink';
 import { ShapeMedia } from '@/components/media/ShapeMedia';
 import { TransitionLink } from '@/components/motion/TransitionLink';
 import { ArrowUpRight } from '@/components/icons';
-import { getProductsByCategory } from '@/data/products';
+import { getProductsByCategory } from '@/services/productRepository';
 import './signatureWatches.css';
 
 const CASE_SHAPES = [

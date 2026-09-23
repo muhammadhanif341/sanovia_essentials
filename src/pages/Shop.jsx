@@ -8,7 +8,7 @@ import { Text } from '@/components/ui/Typography';
 import { RollLink } from '@/components/layout/RollLink';
 import { SelectField, TextField, CheckboxField } from '@/components/ui/Field';
 import { Search, Sliders } from '@/components/icons';
-import { getProductsByCategory, SHOP_VIEWS } from '@/data/products';
+import { getProductsByCategory, SHOP_VIEWS } from '@/services/productRepository';
 import { site } from '@/data/site';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePageMotion } from '@/hooks/useSectionMotion';

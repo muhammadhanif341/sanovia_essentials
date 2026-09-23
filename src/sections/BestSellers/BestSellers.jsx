@@ -5,19 +5,19 @@ import { Price } from '@/components/product/Price';
 import { TransitionLink } from '@/components/motion/TransitionLink';
 import { ArrowUpRight, WhatsApp } from '@/components/icons';
 import { pad2 } from '@/utils/format';
-import { products } from '@/data/products';
+import { getBestsellers } from '@/services/productRepository';
 import { whatsappLink } from '@/utils/whatsapp';
 import './bestSellers.css';
 
 
 /**
- * Best Sellers — a flag inside the real catalogue (Product.tag === "Most asked for"), never
- * an invented ranking. An early brand has no sales dashboard to point to; an honest "we don't
+ * Best Sellers — a flag inside the real catalogue (`product.bestseller === true`), never an
+ * invented ranking. An early brand has no sales dashboard to point to; an honest "we don't
  * know yet" beats a fabricated top-five. Motion: product interaction — each row lifts and its
  * arrow slides on hover/focus, the same affordance a real catalogue row will have.
  */
 export function BestSellers() {
-  const sellers = products.filter((p) => p.tag === 'Most asked for');
+  const sellers = getBestsellers();
 
   return (
     <Section surface="ivory" aria-labelledby="sellers-title">

@@ -10,7 +10,7 @@ import { VariantPicker } from './VariantPicker';
 import { QuantityStepper } from './QuantityStepper';
 import { WishlistButton } from './WishlistButton';
 import { AddToOrderList, OrderOnWhatsApp } from './OrderControls';
-import { availabilityMeta } from '@/data/products';
+import { availabilityMeta } from '@/services/productRepository';
 import './product.css';
 
 /**
@@ -59,7 +59,7 @@ export function QuickView({ product, open, onClose }) {
             {product.name}
           </h2>
           <Rating rating={product.rating} className="sv-qv__rating" />
-          <Price amount={product.price} className="sv-qv__price" />
+          <Price amount={product.price} compareAt={product.compareAtPrice} className="sv-qv__price" />
           {product.description && <p className="t-body t-muted sv-qv__desc">{product.description}</p>}
           <VariantPicker variants={product.variants} value={variant} onChange={setVariant} />
           <div className="sv-cluster" style={{ '--gap': 'var(--space-4)', marginTop: 'var(--space-4)' }}>

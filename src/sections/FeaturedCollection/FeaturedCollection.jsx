@@ -5,7 +5,7 @@ import { TextLink } from '@/components/ui/TextLink';
 import { Tag } from '@/components/ui/Tag';
 import { ShapeMedia } from '@/components/media/ShapeMedia';
 import { ArrowRight, WhatsApp } from '@/components/icons';
-import { products } from '@/data/products';
+import { getProductsByDrop } from '@/services/productRepository';
 import { whatsappLink } from '@/utils/whatsapp';
 import './featuredCollection.css';
 
@@ -15,7 +15,7 @@ import './featuredCollection.css';
  * Motion: image + product reveal (ShapeMedia mask-wipe on the photo, fade on the copy).
  */
 export function FeaturedCollection() {
-  const drop01 = products.filter((p) => p.drop === '01');
+  const drop01 = getProductsByDrop('01');
 
   return (
     <Section surface="dark" aria-labelledby="featured-title">

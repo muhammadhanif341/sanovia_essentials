@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Typography';
 import { ProductGrid } from '@/components/product/ProductGrid';
 import { useWishlist } from '@/context/WishlistContext';
-import { getProduct } from '@/data/products';
+import { getProduct } from '@/services/productRepository';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePageMotion } from '@/hooks/useSectionMotion';
 

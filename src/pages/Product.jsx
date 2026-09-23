@@ -16,7 +16,7 @@ import { WishlistButton } from '@/components/product/WishlistButton';
 import { AddToOrderList, OrderOnWhatsApp } from '@/components/product/OrderControls';
 import { ProductGrid } from '@/components/product/ProductGrid';
 import { WhatsApp } from '@/components/icons';
-import { getProduct, getRelatedProducts, availabilityMeta } from '@/data/products';
+import { getProduct, getRelatedProducts, availabilityMeta } from '@/services/productRepository';
 import { whatsappLink } from '@/utils/whatsapp';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePageMotion } from '@/hooks/useSectionMotion';
@@ -28,7 +28,7 @@ const CATEGORY_LABEL = { watches: 'Watches', jewellery: 'Jewellery' };
 export default function Product() {
   const { slug } = useParams();
   const product = getProduct(slug);
-  useDocumentTitle(product?.name ?? 'Piece not found', product?.description);
+  useDocumentTitle(product?.name ?? 'Piece not found', product?.shortDescription ?? product?.description);
 
   // Product JSON-LD (utils/seo.js) — architecture only today: the catalogue is empty until the
   // client supplies real pieces (data/products.js), so this is a no-op in production for now and
@@ -56,7 +56,19 @@ function ProductDetail({ product }) {
       id: 'details',
       title: 'Details',
       content: (
-        <Text muted>{product.description || "Full details for this piece will be added soon — ask us on WhatsApp in the meantime."}</Text>
+        <div className="sv-stack" style={{ '--gap': 'var(--space-4)' }}>
+          <Text muted>{product.description || "Full details for this piece will be added soon — ask us on WhatsApp in the meantime."}</Text>
+          {product.specifications && Object.keys(product.specifications).length > 0 && (
+            <dl className="sv-pdp__specs">
+              {Object.entries(product.specifications).map(([key, value]) => (
+                <div key={key} className="sv-pdp__spec">
+                  <dt className="t-small t-muted">{key}</dt>
+                  <dd className="t-small">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </div>
       ),
     },
     {
@@ -110,7 +122,12 @@ function ProductDetail({ product }) {
                 </div>
               )}
 
-              <Price amount={product.price} className="sv-pdp__price" />
+              <Price amount={product.price} compareAt={product.compareAtPrice} className="sv-pdp__price" />
+              {product.sku && (
+                <Text size="small" muted className="sv-pdp__sku">
+                  SKU: {product.sku}
+                </Text>
+              )}
               <Rating rating={product.rating} className="sv-pdp__rating" />
 
               {product.description && (
