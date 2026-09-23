@@ -438,12 +438,12 @@ reviews yet"), not a fabricated average.
 **The 16 demo products** (8 watches, 8 jewellery) are written in the brand's established voice — grounded,
 specific, no "experience luxury like never before" copy — spanning every `availability` state, 4 in Drop 01, 5
 flagged `bestseller`, 4 `isNew`, 4 `featured`, 3 with a real `compareAtPrice` discount, 4 with real written
-reviews (ratings elsewhere are honestly `null`). Product **images deliberately still resolve to the existing
-`MediaPlaceholder` system**, not fabricated photography: every product's `images.*` ids follow the real,
-documented `products/<slug>/<view>` convention (`assets/README.md`) so real photography drops in later with zero
-code changes, but no id currently resolves to a file, same honest "Photo needed" treatment as every other
-un-photographed surface on this site — this was a deliberate choice, not an oversight; see the hand-off note at
-the end of this section.
+reviews (ratings elsewhere are honestly `null`). Every product's `images.*` ids follow the real, documented
+`products/<slug>/<view>` convention (`assets/README.md`) — at the time this catalogue was written, no id resolved
+to a file, and every product deliberately showed the honest `MediaPlaceholder` "Photo needed" treatment rather
+than fabricated photography (see the hand-off note at the end of this section). **That has since changed: §13
+documents the AI-generated photography now in place for all 16 products**, added after the client explicitly
+authorized it.
 
 **Admin mutations — intentionally not implemented.** `productRepository.js` exports `createProduct`,
 `updateProduct`, `deleteProduct`, `setProductPublished` with the exact signatures an Admin Portal's
@@ -482,12 +482,53 @@ the selected variant and quantity. Zero console errors across every route, both 
 horizontal overflow. The Hero frame sequence (unrelated to this phase) reverified unaffected. `npm run check`
 green (contrast, lint, build).
 
-**Hand-off note on photography:** this phase's brief asked for "temporary imagery consistent with the brand" if
-real photography is missing. This codebase has repeatedly, deliberately never used stock or fabricated
-photography for products (`components/media/MediaPlaceholder.jsx`'s own comment: "Stock photography is
-deliberately not used: it would misrepresent the products") — inventing photo-realistic images of watches and
-jewellery that don't exist, presented as if they were real Sanovia pieces, would be exactly that. The existing,
-already-verified `MediaPlaceholder` treatment (a labelled, on-brand card naming the exact shot needed) was used
-instead for all 16 products' imagery. If real photography should be generated (AI-rendered or stock) as a
-stand-in despite that established stance, that is a deliberate brand-presentation decision for the client to
-make explicitly, not one to default into.
+**Hand-off note on photography (superseded — see §13):** this phase's brief asked for "temporary imagery
+consistent with the brand" if real photography is missing. This codebase had repeatedly, deliberately never used
+stock or fabricated photography for products (`components/media/MediaPlaceholder.jsx`'s own comment: "Stock
+photography is deliberately not used: it would misrepresent the products") — inventing photo-realistic images of
+watches and jewellery that don't exist, presented as if they were real Sanovia pieces, would be exactly that. The
+existing, already-verified `MediaPlaceholder` treatment (a labelled, on-brand card naming the exact shot needed)
+was used instead for all 16 products' imagery, and the client was told explicitly that generating stand-in
+photography was a brand-presentation decision for them to make, not one to default into. The client then made
+that decision explicitly (next brief: "Create/source appropriate premium product imagery ... using whatever
+image-generation ... capability is available") — §13 documents what was generated as a result.
+
+## 13. Phase 8 — AI-generated demo product photography
+
+Every product's `images.primary` / `images.hover` / `images.gallery` id (already declared in Phase 7's product
+data, see above) now resolves to a real file — the `MediaPlaceholder` "Photo needed" state described just above
+no longer appears for any of the 16 products. Nothing in `data/products.js`, `services/productRepository.js`, or
+any component changed to make this happen — the registry (`utils/media.js`) already resolved these ids from
+`src/assets/images/**` via `import.meta.glob`; this phase only added the files.
+
+**Source:** AI-generated (Cloudinary's image-generation API, FLUX.2 Klein 9B model, `standard` tier), per the
+client's explicit go-ahead described above. Not stock photography, not photos of real third-party products —
+each image was generated from a prompt built from that product's own `description`/`specifications` (case shape,
+plating, dial colour, strap/chain material) so the photo actually matches the copy, styled consistently: dark
+espresso-to-black gradient background, soft directional studio lighting, editorial/catalogue framing, no text/
+logos/watermarks, no visible faces on any worn/lifestyle shot.
+
+**Coverage:** 35 unique images across all 16 products — every `front`/`primary` shot, every `wrist`/`worn` shot,
+plus `detail`/`clasp` macro shots for the products whose `images.gallery` already listed them (Tonneau Signature
+Watch, Oval Steel Watch, Circle Rose Gold Watch, Layered Chain Necklace). One additional image,
+`editorial/drop-01-hero`, was generated for the homepage Featured Collection spotlight (`sections/
+FeaturedCollection/FeaturedCollection.jsx`) — an id that section already referenced but that had no file, so it
+was still showing "Drop 01 photo needed" on every visit; that component's id and markup are unchanged, only the
+file was added.
+
+**Location:** `src/assets/images/products/<slug>/<view>.jpg` (unsuffixed — no responsive width variants were
+generated; see "Known follow-up" below) and `src/assets/images/editorial/drop-01-hero.jpg`, exactly matching the
+existing naming convention in `assets/README.md`.
+
+**Deliberately out of scope:** the five `CollectionShowcase` category-navigation cards (Watches/Jewellery/Drop 01/
+Collections/About — `id={null}` by design, not tied to any product), the `BrandStory` lifestyle photo, and the
+Instagram social-strip stills were left as `MediaPlaceholder`s. None of these are product photography — they're
+editorial/social imagery outside `data/products.js` — and generating stand-ins for them wasn't part of the
+client's ask, which was specifically about product imagery and the product data architecture.
+
+**Known follow-up (not done here — out of scope for "add the missing photography"):** each file is a single
+unsuffixed JPEG (300–600 KB), not the `<name>-<width>.<avif|webp|jpg>` responsive multi-format set the asset
+budget table in `assets/README.md` calls for (≤120 KB @ 800w for a product image). The registry supports a single
+unsuffixed file today (that's what's used here) so nothing is broken, but shipping these at full size to every
+device is real weight — before production launch, run each through a resize/compress pass into the documented
+`-480/-800/-1200` AVIF/WebP/JPEG set.
