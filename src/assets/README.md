@@ -45,28 +45,44 @@ sources and a `srcset` from every width it finds. A single unsuffixed file (`fro
 Naming: lowercase, hyphens, no spaces — `{drop}-{product}-{variant}-{view}` for products
 (e.g. `drop01-tonneau-burgundy-front`).
 
-## Hero video
+## Hero video — SUPERSEDED for the Hero itself (Phase 7)
 
-Drop these in `src/assets/video/hero/`:
+**The `<Hero/>` section no longer uses this.** It was rebuilt around a scroll-scrubbed canvas frame
+sequence (`useHeroFrames` → `hooks/useSectionMotion.js`, `animations/primitives/frameSequence.js`,
+frames in `video/hero/frames/`), per explicit client direction that the hero must be scroll-driven,
+never autoplay/click-to-play video. The `useFilm()` / `<FilmVideo/>` / `<FilmControl/>` / `<HeroVideo/>`
+stack below is still real, working code — kept as a general-purpose "film" primitive available to
+OTHER sections later (see the dev Motion Lab demo) — but it is no longer reachable from any
+production route.
+
+**Consequence found in the Phase 7 QA audit:** `video/hero/hero.mp4` (~1.3 MB) and
+`images/editorial/hero-poster-1280.{jpg,webp}` (~63 KB) are matched by `import.meta.glob` in
+`utils/media.js` regardless of whether any live code path calls `getVideo()`/`getPicture()` with
+those ids — so despite being unreachable from any production route, they still get bundled and
+shipped to every visitor. Recommended: delete those three files (the `frames/` folder and
+`editorial/hero-hold-*` must stay — the frame sequence and its fallback still use them). Left in
+place for now — deleting shipped assets needs an explicit go-ahead, not a QA pass.
+
+Drop these in `src/assets/video/hero/` if/when the general-purpose film primitive is used elsewhere:
 
 | File | Spec |
 |---|---|
 | `hero.mp4` | H.264 High@4.0, BT.709, no audio track, plays once and holds its last frame |
 | `hero.webm` | Optional VP9/AV1 alternative (not currently present) |
 | `../images/editorial/hero-poster-<w>.avif/.webp/.jpg` | First frame — poster, and what plays before autoplay is allowed to start (seamless hand-off) |
-| `../images/editorial/hero-hold-<w>.avif/.webp/.jpg` | Best still — shown under reduced motion / Save-Data / a blocked autoplay, in place of the poster |
+| `../images/editorial/hero-hold-<w>.avif/.webp/.jpg` | Best still — shown under reduced motion / Save-Data / a blocked autoplay, in place of the poster (also the Hero frame sequence's own fallback if frame assets are ever missing — keep this one) |
 
 `useFilm()` + `<FilmVideo/>` / `<FilmControl/>` (`src/hooks/useFilm.js`, `src/components/media/Film.jsx`)
 own this: autoplay is gated on reduced-motion and Save-Data, the film pauses off-screen and in
 background tabs, and a pause/play/replay control is always present (WCAG 2.2.2). `<HeroVideo/>` wraps
 the same pieces inside a `<ShapeMedia>` mask for use elsewhere (e.g. the style guide).
 
-**Current file is a placeholder, not final footage.** It was encoded from a 300-frame JPEG sequence
-the client supplied (`ezgif-157b660b95a7750a-jpg/`, itself an exported GIF/video, not a camera
-original) — there is no higher-resolution source to re-encode from. It also shows a third-party
-**"SHARLY"-branded watch**, visible on the dial — a stock/reference animation, not a Sanovia product.
-**This must be replaced before launch**; it exists so the hero's motion, layout and performance could
-be built and verified against a real video file instead of a placeholder block.
+**The file removed above was a placeholder, not final footage** (for whenever this primitive is used
+for real): it was encoded from a 300-frame JPEG sequence the client supplied
+(`ezgif-157b660b95a7750a-jpg/`, itself an exported GIF/video, not a camera original) — there is no
+higher-resolution source to re-encode from. It also showed a third-party **"SHARLY"-branded watch**,
+visible on the dial — a stock/reference animation, not a Sanovia product. Any future real use of this
+primitive needs real footage, not a re-drop of the old placeholder.
 
 Re-encode command (ffmpeg ≥ 6, H.264, ~1.3 MB at 1280×720/30fps/10s):
 

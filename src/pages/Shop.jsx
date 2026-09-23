@@ -115,7 +115,7 @@ export default function Shop() {
     return sortProducts(list, sort);
   }, [base, query, hideUnavailable, minPrice, maxPrice, sort]);
 
-  useDocumentTitle(query ? 'Search' : title);
+  useDocumentTitle(query ? 'Search' : title, query ? undefined : `Shop ${title.toLowerCase()} at Sanovia Essentials — minimal everyday watches and jewellery.`);
 
   const setParam = (key, value) =>
     setParams(

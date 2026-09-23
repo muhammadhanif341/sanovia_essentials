@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useLayoutEffect, use
 import { useLocation, useNavigate } from 'react-router-dom';
 import { curtainEnter, curtainExit, curtainReset, prefersReducedMotion, refreshScrollTriggers } from '@/animations';
 import { findRoute } from '@/routes';
-import { formatTitle } from '@/hooks/useDocumentTitle';
 import { announce } from '@/utils/a11y';
 import { Logo } from '@/components/media/Logo';
 import './motion.css';
@@ -82,9 +81,13 @@ export function TransitionProvider({ children }) {
     // Two frames: let the new page mount and its useMotion contexts create their triggers.
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
-        const route = findRoute(location.pathname);
-        // Title may be refined by the page itself (useDocumentTitle); this is the default.
-        if (route) document.title = formatTitle(route.title);
+        // No fallback title-set here on purpose (there used to be one): every route's own
+        // useDocumentTitle already runs on mount, before this double-rAF-delayed callback
+        // fires — setting a generic routes.jsx title here as a "default" raced the page's
+        // own, more specific one and clobbered it (e.g. every /shop view announced as the
+        // generic "Shop" instead of "All pieces" / "Watches" / a search result), which also
+        // broke the announce() below for screen-reader users. document.title is already
+        // correct here; just read it.
         document.getElementById('main')?.focus({ preventScroll: true });
         announce(document.title);
         refreshScrollTriggers(60);

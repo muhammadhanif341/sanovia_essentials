@@ -1,7 +1,31 @@
 /* Cinematic hero + the "sheet" (next section) it hands off to.
    The hero is STICKY: it stays put while the sheet slides over it — no pin spacer, robust in
    dynamic-toolbar mobile browsers. GSAP only adds the scrubbed push-in / dim / lift on top of that;
-   with motion off the hand-off is still a native, purely CSS sheet-over-hero. */
+   with motion off the hand-off is still a native, purely CSS sheet-over-hero.
+
+   `.sv-hero` itself is UNCHANGED from Phase 3–6 (still exactly 100svh, still the single sticky
+   element bounded by `.hero-stage`, pages/Home.jsx) — it is NOT inflated to add scroll runway
+   for the frame sequence. That was tried and is wrong: a `position: sticky` element's own stuck
+   DURATION is `containingBlock.height − element.height`, so growing the element's own height
+   cancels itself out and shrinks its "spare" room by nothing — the extra height doesn't buy it
+   a single extra pixel of stuck scroll, it just adds hidden overflow. (Confirmed by measurement,
+   not just spec-reading: with the old `[data-hero-frames='active']` height hack, `.sv-hero`
+   measurably un-stuck after exactly one viewport of scroll — `.hero-stage`'s own height minus
+   the inflated hero's height, i.e. `<BrandIntro/>`'s height — no matter how tall the hero was
+   made, so the frame sequence only ever scrubbed for the first third of its range before the
+   whole hero started scrolling away like an ordinary block.)
+
+   The fix: leave `.sv-hero` at its natural 100svh, and instead give `.hero-stage` more "spare"
+   room via an inert SIBLING spacer, `.sv-hero__runway` (rendered by <Hero/> itself, right after
+   the `<section>`, only when frame assets are active — see useHeroFrames, hooks/useSectionMotion.js).
+   Since `.sv-hero`'s stuck duration is `hero-stage.height − sv-hero.height`, and hero-stage =
+   sv-hero + runway + <BrandIntro/>, adding N viewports of runway buys `.sv-hero` exactly N more
+   viewports of stuck-while-scrubbing time, independent of sv-hero's own size — the correct lever.
+   `animations/primitives/frameSequence.js` scrubs frames over exactly the runway's span
+   (`endTrigger: runway, end: 'bottom bottom'`), so the sequence finishes right as the runway
+   ends — precisely when `<BrandIntro/>`'s own hand-off trigger (`animations/hero.js` heroExit,
+   unchanged) starts, with no gap and no overlap. `useHeroIntro`'s hand-off look-up (`hooks/
+   useSectionMotion.js`) skips the runway via `[data-hero-runway]` to still find `<BrandIntro/>`. */
 
 .sv-hero {
   position: sticky;
@@ -19,6 +43,15 @@
 /* Once the sheet fully covers the hero, don't keep painting it. */
 .sv-hero[hidden] {
   display: none;
+}
+
+/* Inert scroll-runway spacer — see the architecture note above. No visual content of its own;
+   it only exists so `.sv-hero` has extra "spare" room in `.hero-stage` to stay stuck across
+   while the frame sequence scrubs. Two viewports of pure scrub, in addition to the one viewport
+   `.sv-hero` itself already contributes to the stuck duration. */
+.sv-hero__runway {
+  height: 200vh;
+  height: 200svh;
 }
 
 /* ---- Film ---------------------------------------------------------------------------------- */

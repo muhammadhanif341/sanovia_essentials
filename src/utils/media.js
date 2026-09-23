@@ -4,6 +4,7 @@
  * Conventions (see assets-src/README.md):
  *   src/assets/images/<group>/<name>-<width>.<avif|webp|jpg|png>
  *   src/assets/video/<group>/<name>.<mp4|webm>
+ *   src/assets/video/<group>/frames/<name>-<NNN>.<jpg|webp|…>   numbered scroll-scrub sequence
  *
  * Files are discovered at build time with import.meta.glob, so components refer
  * to media by a stable id ("products/tonneau-burgundy/front") and NEVER by path.
@@ -17,6 +18,14 @@ const imageFiles = import.meta.glob('/src/assets/images/**/*.{avif,webp,jpg,jpeg
   import: 'default',
 });
 const videoFiles = import.meta.glob('/src/assets/video/**/*.{mp4,webm}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+// A SEPARATE glob (not the images one above): frame filenames are numbered
+// ("frame-001.jpg"), which would collide with the images registry's "-<width>"
+// suffix parsing (it would mistake the frame number for a responsive-width variant).
+const frameFiles = import.meta.glob('/src/assets/video/**/frames/*.{avif,webp,jpg,jpeg,png}', {
   eager: true,
   query: '?url',
   import: 'default',
@@ -72,5 +81,22 @@ export function getVideo(id) {
   return mp4 || webm ? { mp4, webm } : null;
 }
 
+/**
+ * A numbered image sequence for scroll-scrubbed playback, e.g. "hero" →
+ * src/assets/video/hero/frames/frame-001.jpg … frame-185.jpg.
+ * @returns {string[]} frame URLs sorted in filename order (numeric-aware); [] if none exist
+ */
+export function getFrameSequence(id) {
+  const prefix = `${VID_ROOT}${id}/frames/`;
+  return Object.entries(frameFiles)
+    .filter(([path]) => path.startsWith(prefix))
+    .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+    .map(([, url]) => url);
+}
+
 /** Dev helper: what did the registry find? */
-export const mediaStats = () => ({ images: images.size, videos: Object.keys(videoFiles).length });
+export const mediaStats = () => ({
+  images: images.size,
+  videos: Object.keys(videoFiles).length,
+  frames: Object.keys(frameFiles).length,
+});
