@@ -532,3 +532,84 @@ budget table in `assets/README.md` calls for (≤120 KB @ 800w for a product ima
 unsuffixed file today (that's what's used here) so nothing is broken, but shipping these at full size to every
 device is real weight — before production launch, run each through a resize/compress pass into the documented
 `-480/-800/-1200` AVIF/WebP/JPEG set.
+
+## 14. Phase 9 — full e-commerce checkout (WhatsApp demoted to support)
+
+The brief: stop using WhatsApp as the way to complete a purchase — build a real Cart → Information → Shipping →
+Payment → Confirmation checkout, with a centralized pricing/shipping/tax/discount engine and a payment-provider
+abstraction, while changing nothing about the Hero, nav, product cards or existing sections. WhatsApp keeps a
+role, but only as support ("Need help? Chat with us"), never as the purchase path.
+
+**What "the cart" is now.** `context/OrderListContext.jsx` (still named for the WhatsApp-era "order list" model —
+renaming the hook across every call site wasn't worth the diff) already had real add/remove/qty/persist logic
+from Phase 2–3; it gained an `image` id and a `stock` cap per line (added qty is now capped at the product's
+tracked `stock`, not just the flat `MAX_QTY`) and a `subtotal` selector. `components/product/OrderListDrawer.jsx`
+is unchanged in structure but its primary action is now **"Proceed to Checkout"** (→ `/checkout`), with "Continue
+shopping" beside it and WhatsApp reduced to a small "Need help? Chat with us" link that asks a support question,
+never places an order. The PDP (`pages/Product.jsx`) makes the same swap: **"Add to cart" is the primary CTA**;
+the former one-tap "Order on WhatsApp" buy-now button is gone for orderable products, replaced by a secondary
+"Ask a question on WhatsApp" link. `OrderOnWhatsApp` (components/product/OrderControls.jsx) still exists and is
+still used, but only for the *not-orderable* case (out-of-stock/coming-soon/made-to-order asks) — support, not a
+purchase path, which is fine because nothing is purchasable there anyway.
+
+**New services (all following productRepository.js's exact seam: named functions today reading local
+config/localStorage, the same function names later reading a real backend):**
+- `data/shipping.js` + `services/shippingService.js` — configurable methods (Standard/Express) and a
+  free-shipping threshold. No component hardcodes a shipping price.
+- `data/tax.js` + `services/taxService.js` — a single configurable rate (0% today, TBC with client, same honesty
+  convention as `data/site.js`'s other TBC fields), applied to subtotal-minus-discount.
+- `data/promoCodes.js` + `services/discountService.js` — demo codes (`SANOVIA10`, `SAVE500`) with type
+  (percentage/fixed), minimum order, expiry and a usage limit field (enforcement is demo-only — see the file's
+  own doc comment on what real enforcement needs).
+- `utils/pricing.js` — **the** centralized `calculateOrderTotals()`: subtotal → discount → shipping → tax →
+  total. The cart drawer, checkout page, order confirmation and order creation all call this one function, so
+  the same total is never computed two different ways.
+- `utils/validation.js` — email/phone/required-field/card-detail validators used by every checkout form.
+- `services/paymentService.js` — a `PaymentProvider` abstraction (`createSession`/`confirmPayment`). Cash on
+  Delivery is real (no gateway involved, payment collected on delivery). Card and Digital Wallet run through a
+  clearly-labelled **test-mode simulation** (no gateway credentials exist in this project) — test card
+  `4242 4242 4242 4242` simulates success, `4000 0000 0000 0002` simulates a decline, so failure handling is
+  genuinely exercisable. Swapping in a real gateway later is adding one provider file and registering it in
+  `LIVE_PROVIDERS`, gated by `VITE_PAYMENTS_LIVE` — no checkout UI change required. See §18 (Security) below.
+- `services/orderService.js` — `createOrder()` generates a human-readable order number (`SAN-2026-000123`) and
+  persists to localStorage (demo persistence — the file's doc comment spells out exactly what a real backend
+  must add: server-side re-validation, auth-gated reads, auth-gated status mutations). Critically,
+  `revalidateCartItems()` re-checks every cart line against the **live catalogue** right before an order is
+  created — availability, stock, and **price** all come from `data/products.js` at order time, never the price
+  the cart happened to cache, which is the browser-side version of "never trust frontend prices" (a real backend
+  must still repeat this server-side; the comment says so explicitly).
+
+**Checkout page** (`pages/Checkout.jsx`, route `/checkout`) — three in-page steps (Information → Shipping →
+Payment) with a 5-node progress indicator (`components/checkout/CheckoutSteps.jsx`: Cart done → Information →
+Shipping → Payment → Confirmation) and an always-visible, desktop-sticky `OrderSummary`
+(`components/checkout/OrderSummary.jsx`) with a working promo-code field. Shipping/payment method selection uses
+`components/checkout/OptionList.jsx` (native radios styled as cards — real keyboard/AT behaviour for free).
+Guards: an empty cart shows "add a piece before checking out" instead of a blank form; "Place Order" disables
+itself and guards against a second submit while a request is in flight (no duplicate orders on a double-click);
+a failed/declined payment shows the exact reason and leaves every field intact so the customer can just fix and
+retry, without losing their cart. On success the cart is cleared and the browser is sent to
+`/order-confirmation?order=<orderNumber>` — a query param, not just router state, so a refresh or a shared link
+still resolves the order (`pages/OrderConfirmation.jsx` reads it straight from `orderService.getOrder()`).
+
+**Security note (brief §18):** this remains a static, backendless site. Stock/price re-validation, payment
+confirmation and order persistence all currently run in the customer's own browser — good enough to make the
+checkout flow genuinely functional and testable end-to-end, but **not** a substitute for server-side
+verification. Every file that stands in for a future backend (`orderService.js`, `paymentService.js`,
+`discountService.js`) says so directly in its own doc comment, the same pattern `productRepository.js`
+established in Phase 7.
+
+**Verified:** full flow tested end-to-end in a real browser (not just read) — add to cart → qty change → cart
+drawer (real thumbnail, correct line subtotal) → checkout → validation (empty fields, invalid email, both
+blocked with inline messages) → shipping method change and promo code (`SANOVIA10`) both recompute the total
+immediately → payment step: a declined test card shows a clear retry-able error, a successful test card creates
+a real order and lands on a working, refreshable/deep-linkable confirmation page with correct order number,
+totals, address and payment/order status → cart persists across a real page refresh → checkout correctly blocks
+on an empty cart → a double-click on "Place Order" produced exactly one order (confirmed via localStorage) →
+zero console errors and zero horizontal overflow at 375px, 768px and 1440px. `npm run check` (contrast/lint/
+build) green throughout.
+
+**Not done (explicitly out of scope / needs real infrastructure before production):** a real payment gateway
+(Stripe or similar — architecture is ready, credentials are not), transactional email (order confirmation/admin
+notification — no email provider configured), a real backend for order storage and server-side re-validation, an
+admin UI to act on `updateOrderStatus`/`updatePaymentStatus` (the functions exist, unauthenticated, in
+`orderService.js`), and country/state pickers beyond a short illustrative list.

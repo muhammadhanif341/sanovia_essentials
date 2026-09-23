@@ -9,14 +9,18 @@ import { Rating } from './Rating';
 import { VariantPicker } from './VariantPicker';
 import { QuantityStepper } from './QuantityStepper';
 import { WishlistButton } from './WishlistButton';
+import { Button } from '@/components/ui/Button';
+import { WhatsApp } from '@/components/icons';
 import { AddToOrderList, OrderOnWhatsApp } from './OrderControls';
 import { availabilityMeta } from '@/services/productRepository';
+import { whatsappLink } from '@/utils/whatsapp';
 import './product.css';
 
 /**
  * A fast look without leaving the grid: drawer on mobile, right panel from tablet up
  * (same Dialog as the cart, so it feels like the same product). Same order actions as
- * the PDP — variant, quantity, add to cart, order on WhatsApp — plus a link to the full page.
+ * the PDP — variant, quantity, add to cart — plus a link to the full page. WhatsApp is
+ * support-only here too, matching the PDP (see docs/ARCHITECTURE.md §14).
  */
 export function QuickView({ product, open, onClose }) {
   const [variant, setVariant] = useState(product?.variants?.[0]);
@@ -77,8 +81,16 @@ export function QuickView({ product, open, onClose }) {
               />
             ) : (
               <>
-                <OrderOnWhatsApp product={product} variant={variant} qty={qty} block />
-                <AddToOrderList product={product} variant={variant} qty={qty} block variantStyle="ghost" />
+                <AddToOrderList product={product} variant={variant} qty={qty} block variantStyle="primary" />
+                <Button
+                  href={whatsappLink(`Hi Sanovia! I have a question about the ${product.name}.`)}
+                  external
+                  variant="ghost"
+                  block
+                  iconBefore={<WhatsApp size={18} />}
+                >
+                  Ask a question on WhatsApp
+                </Button>
               </>
             )}
           </div>

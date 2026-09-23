@@ -157,3 +157,31 @@ export const ChevronDown = (p) => (
     <path d="m5 8.5 7 7 7-7" />
   </Svg>
 );
+/* Checkout: secure badge, payment methods, delivery. */
+export const Lock = (p) => (
+  <Svg {...p}>
+    <rect x="5.25" y="10.5" width="13.5" height="9" rx="1.5" />
+    <path d="M8 10.5V7.75a4 4 0 0 1 8 0V10.5" />
+  </Svg>
+);
+export const CreditCard = (p) => (
+  <Svg {...p}>
+    <rect x="2.75" y="5.75" width="18.5" height="13" rx="2" />
+    <path d="M2.75 10h18.5M6 15h4" />
+  </Svg>
+);
+export const Wallet = (p) => (
+  <Svg {...p}>
+    <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18a1 1 0 0 1 1 1v2" />
+    <rect x="3" y="7.5" width="18" height="12" rx="2.5" />
+    <circle cx="16.5" cy="13.5" r="1.25" />
+  </Svg>
+);
+export const Truck = (p) => (
+  <Svg {...p}>
+    <path d="M2.75 7.5h11v9h-11z" />
+    <path d="M13.75 10.5h3.5l3 3v3h-6.5z" />
+    <circle cx="7" cy="18.25" r="1.75" />
+    <circle cx="17" cy="18.25" r="1.75" />
+  </Svg>
+);

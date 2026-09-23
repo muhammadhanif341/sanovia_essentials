@@ -8,16 +8,17 @@ import { Price } from './Price';
 import { QuantityStepper } from './QuantityStepper';
 import { Close, WhatsApp } from '@/components/icons';
 import { formatPrice } from '@/utils/format';
-import { orderListMessage, whatsappLink } from '@/utils/whatsapp';
+import { whatsappLink } from '@/utils/whatsapp';
 import './product.css';
 
 /**
- * The order list. Bottom sheet on phones, right drawer from tablet up (Dialog handles the
- * structural switch). "Send on WhatsApp" composes one prefilled message from the list.
- * Prices are indicative — the final price/delivery/payment are confirmed on WhatsApp.
+ * The cart. Bottom sheet on phones, right drawer from tablet up (Dialog handles the
+ * structural switch). "Proceed to Checkout" is the primary, on-site purchase path
+ * (pages/Checkout.jsx); WhatsApp remains only as a secondary support channel — see
+ * docs/ARCHITECTURE.md §14 ("WhatsApp is no longer the primary checkout").
  */
 export function OrderListDrawer() {
-  const { open, closeDrawer, items, setQty, remove, clear, count } = useOrderList();
+  const { open, closeDrawer, items, setQty, remove, clear } = useOrderList();
   const closeRef = useRef(null);
 
   const priced = items.filter((i) => i.price != null);
@@ -39,7 +40,7 @@ export function OrderListDrawer() {
         {items.length === 0 ? (
           <div className="sv-olist__items">
             <Text className="sv-empty" muted>
-              Nothing here yet. Add pieces and send them to us in one message.
+              Nothing here yet. Add a piece to get started.
             </Text>
           </div>
         ) : (
@@ -48,6 +49,7 @@ export function OrderListDrawer() {
               {items.map((item) => (
                 <li key={item.id} className="sv-olist__item">
                   <ShapeMedia
+                    id={item.image}
                     decorative
                     shape={item.shape ?? 'arch'}
                     ratio={item.shape === 'circle' ? '1 / 1' : '4 / 5'}
@@ -64,6 +66,11 @@ export function OrderListDrawer() {
                       label={`Quantity for ${item.name}`}
                       className="sv-olist__qty"
                     />
+                    {item.price != null && (
+                      <p className="t-small t-muted sv-olist__line-subtotal">
+                        Subtotal: {formatPrice(item.price * item.qty)}
+                      </p>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -80,28 +87,34 @@ export function OrderListDrawer() {
             <div className="sv-olist__foot">
               {priced.length > 0 && (
                 <p className="t-body" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Estimated total</span>
+                  <span>Cart subtotal</span>
                   <span className="t-price">
                     {formatPrice(total)}
                     {hasUnpriced && ' +'}
                   </span>
                 </p>
               )}
-              <p className="sv-olist__note t-small">
-                We confirm price, delivery and payment with you on WhatsApp before anything is final.
-              </p>
-              <Button
-                block
-                href={whatsappLink(orderListMessage(items))}
-                external
-                iconBefore={<WhatsApp size={18} />}
-                onClick={closeDrawer}
-              >
-                Send {count} {count === 1 ? 'piece' : 'pieces'} on WhatsApp
+              <p className="sv-olist__note t-small">Shipping, discounts and tax are calculated at checkout.</p>
+              <Button block to="/checkout" onClick={closeDrawer}>
+                Proceed to Checkout
               </Button>
-              <Button variant="ghost" size="sm" block onClick={clear}>
-                Clear list
+              <Button variant="ghost" size="sm" block to="/shop" onClick={closeDrawer}>
+                Continue shopping
               </Button>
+              <div className="sv-olist__support">
+                <Button
+                  href={whatsappLink('Hi Sanovia! I have a question about my cart.')}
+                  external
+                  variant="ghost"
+                  size="sm"
+                  iconBefore={<WhatsApp size={16} />}
+                >
+                  Need help? Chat with us
+                </Button>
+                <button type="button" className="sv-olist__clear" onClick={clear}>
+                  Clear cart
+                </button>
+              </div>
             </div>
           </>
         )}

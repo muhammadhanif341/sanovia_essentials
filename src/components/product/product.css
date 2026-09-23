@@ -281,6 +281,27 @@
 .sv-olist__note {
   color: var(--fg-muted);
 }
+.sv-olist__line-subtotal {
+  margin-top: var(--space-1);
+}
+.sv-olist__support {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.sv-olist__clear {
+  color: var(--fg-muted);
+  font: 400 var(--text-small) / 1.2 var(--font-body);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  min-height: 44px;
+  padding: 0 var(--space-2);
+}
+.sv-olist__clear:hover {
+  color: var(--fg);
+}
 @media (min-width: 768px) {
   .sv-olist__items,
   .sv-olist__foot {

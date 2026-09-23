@@ -150,8 +150,16 @@ function ProductDetail({ product }) {
                 ) : (
                   <>
                     <QuantityStepper value={qty} onChange={setQty} label={`Quantity for ${product.name}`} size="lg" />
-                    <OrderOnWhatsApp product={product} variant={variant} qty={qty} block />
-                    <AddToOrderList product={product} variant={variant} qty={qty} block variantStyle="ghost" />
+                    <AddToOrderList product={product} variant={variant} qty={qty} block variantStyle="primary" />
+                    <Button
+                      href={whatsappLink(`Hi Sanovia! I have a question about the ${product.name}.`)}
+                      external
+                      variant="ghost"
+                      block
+                      iconBefore={<WhatsApp size={18} />}
+                    >
+                      Ask a question on WhatsApp
+                    </Button>
                   </>
                 )}
               </div>

@@ -2,16 +2,17 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer,
 import { announce } from '@/utils/a11y';
 
 /**
- * The "order list": this brand orders by WhatsApp message (bio: "Shop via Catalog / DM"),
- * so instead of a cart + checkout there is a list that composes ONE prefilled message.
- * (Commerce model A in DESIGN-BLUEPRINT §14 — confirm with the client.)
+ * The "order list": this site's cart. Named for the WhatsApp-era commerce model it started
+ * as (Commerce model A in DESIGN-BLUEPRINT §14) — the hook/storage names stayed to avoid
+ * touching every call site, but this now backs the full checkout (pages/Checkout.jsx),
+ * not just a prefilled WhatsApp message. See docs/ARCHITECTURE.md §14.
  *
  * Persisted in localStorage, defensively: storage can throw (private windows,
  * blocked site data) and the app must work without it.
  */
 const STORAGE_KEY = 'sanovia.orderList.v1';
 
-/** @typedef {{ id:string, slug:string, name:string, variant?:string, qty:number, price?:number|null, shape?:string }} OrderItem */
+/** @typedef {{ id:string, slug:string, name:string, variant?:string, qty:number, price?:number|null, shape?:string, image?:string }} OrderItem */
 
 const load = () => {
   try {
@@ -29,11 +30,13 @@ function reducer(state, action) {
   switch (action.type) {
     case 'add': {
       const { item, qty } = action;
+      // Respect tracked stock (when the product declares it) as well as the per-line cap.
+      const cap = typeof item.stock === 'number' ? Math.min(MAX_QTY, Math.max(0, item.stock)) : MAX_QTY;
       const existing = state.find((i) => i.id === item.id);
       if (existing) {
-        return state.map((i) => (i.id === item.id ? { ...i, qty: Math.min(MAX_QTY, i.qty + qty) } : i));
+        return state.map((i) => (i.id === item.id ? { ...i, qty: Math.min(cap, i.qty + qty) } : i));
       }
-      return [...state, { ...item, qty: Math.min(MAX_QTY, Math.max(1, qty)) }];
+      return [...state, { ...item, qty: Math.min(cap, Math.max(1, qty)) }];
     }
     case 'qty':
       return state
@@ -67,7 +70,16 @@ export function OrderListProvider({ children }) {
     dispatch({
       type: 'add',
       qty,
-      item: { id, slug: product.slug, name: product.name, variant, price: product.price ?? null, shape: product.shape },
+      item: {
+        id,
+        slug: product.slug,
+        name: product.name,
+        variant,
+        price: product.price ?? null,
+        shape: product.shape,
+        image: product.images?.primary,
+        stock: product.stock,
+      },
     });
     announce(`${product.name} added to your cart.`);
   }, []);
@@ -82,6 +94,7 @@ export function OrderListProvider({ children }) {
     () => ({
       items,
       count: items.reduce((n, i) => n + i.qty, 0),
+      subtotal: items.reduce((sum, i) => sum + (i.price ?? 0) * i.qty, 0),
       open,
       add,
       setQty,
