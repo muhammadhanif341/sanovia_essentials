@@ -5,11 +5,16 @@ html {
   scrollbar-gutter: stable; /* scroll-lock never shifts the layout */
   scroll-padding-top: calc(var(--header-h) + var(--space-4)); /* WCAG 2.4.11: sticky header never hides focus */
 }
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
+/* Deliberately NOT `scroll-behavior: smooth` here. A global smooth-scroll default animates
+   EVERY programmatic/native scroll on the page — including ones this app never intended to
+   animate — and on mobile that default fighting a fast native fling (finger-swipe momentum
+   scroll, which this property was never meant to touch, but real browsers aren't perfectly
+   spec-clean about the boundary) is what produced the "fast swipe snaps back to top" bug.
+   The handful of scrolls that SHOULD animate (checkout step change, gallery arrows, "view
+   the collection") already pass `behavior: 'smooth'` directly to their own scrollTo/
+   scrollIntoView call, which overrides this property regardless of its value — so removing
+   the global default costs nothing for those, and removes the only browser-wide lever that
+   could animate a scroll this app never asked to animate. */
 html[data-scroll-locked] {
   overflow: hidden;
 }
