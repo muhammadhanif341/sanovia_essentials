@@ -83,7 +83,7 @@ function ProductDetail({ product }) {
           <Button
             href={whatsappLink(`Hi Sanovia! I have a shipping question about the ${product.name}.`)}
             external
-            variant="ghost"
+            variant="whatsapp"
             size="sm"
             iconBefore={<WhatsApp size={16} />}
           >
@@ -145,7 +145,6 @@ function ProductDetail({ product }) {
                     variant={variant}
                     label={`Ask about ${avail.label.toLowerCase()}`}
                     block
-                    variantStyle="ghost"
                   />
                 ) : (
                   <>
@@ -154,7 +153,7 @@ function ProductDetail({ product }) {
                     <Button
                       href={whatsappLink(`Hi Sanovia! I have a question about the ${product.name}.`)}
                       external
-                      variant="ghost"
+                      variant="whatsapp"
                       block
                       iconBefore={<WhatsApp size={18} />}
                     >

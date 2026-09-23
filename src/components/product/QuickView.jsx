@@ -77,7 +77,6 @@ export function QuickView({ product, open, onClose }) {
                 variant={variant}
                 label={`Ask about ${avail.label.toLowerCase()}`}
                 block
-                variantStyle="ghost"
               />
             ) : (
               <>
@@ -85,7 +84,7 @@ export function QuickView({ product, open, onClose }) {
                 <Button
                   href={whatsappLink(`Hi Sanovia! I have a question about the ${product.name}.`)}
                   external
-                  variant="ghost"
+                  variant="whatsapp"
                   block
                   iconBefore={<WhatsApp size={18} />}
                 >

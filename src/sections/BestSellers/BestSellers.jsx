@@ -54,7 +54,7 @@ export function BestSellers() {
               <Button
                 href={whatsappLink('Hi Sanovia! What are people asking for most right now?')}
                 external
-                variant="ghost"
+                variant="whatsapp"
                 iconBefore={<WhatsApp size={18} />}
               >
                 Ask on WhatsApp

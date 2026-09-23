@@ -259,7 +259,7 @@
   display: inline-flex;
 }
 
-/* ---- WhatsApp FAB: quiet by default, warms up on hover/focus ------------------------- */
+/* ---- WhatsApp FAB: fixed WhatsApp brand green, darkens on hover/focus ---------------- */
 .sv-fab {
   position: fixed;
   right: max(var(--space-5), env(safe-area-inset-right));
@@ -271,9 +271,9 @@
   height: 52px;
   padding: 0 0.95rem;
   border-radius: var(--radius-pill);
-  background: var(--espresso-800);
-  color: var(--champagne-400);
-  border: 1px solid var(--hairline-strong);
+  background: var(--whatsapp-green);
+  color: #fff;
+  border: 1px solid transparent;
   text-decoration: none;
   box-shadow: 0 8px 28px rgb(28 20 14 / 0.35);
   transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out),
@@ -289,8 +289,8 @@
 @media (hover: hover) and (pointer: fine) {
   .sv-fab:hover,
   .sv-fab:focus-visible {
-    background: var(--champagne-400);
-    color: var(--espresso-900);
+    background: var(--whatsapp-green-dark);
+    color: #fff;
     transform: translateY(-2px);
   }
   .sv-fab:hover .sv-fab__tip,

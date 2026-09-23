@@ -18,6 +18,10 @@
      (urgency badge, form/payment validation) — deliberately kept outside the
      brand ramp so they stay recognisable as "wrong"/"low stock"/"success"
      rather than reading as another brand accent.
+   • --whatsapp-green/-dark are WhatsApp's own fixed brand colours, used only
+     on WhatsApp-specific buttons/icons/FAB for instant recognisability — the
+     same "functional, not decorative" exception as above, never used as a
+     general accent and never swapped per [data-surface].
    ========================================================================== */
 
 :root {
@@ -46,6 +50,8 @@
   --error-light: #a32e22;
   --success-dark: #9dbb8a;
   --success-light: #4a6b3a;
+  --whatsapp-green: #25d366; /* official WhatsApp green — button/FAB/icon fill */
+  --whatsapp-green-dark: #128c7e; /* official WhatsApp dark green — hover/active */
 
   /* ---- Typography ------------------------------------------------------- */
   --font-display: 'Cormorant Variable', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
