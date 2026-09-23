@@ -652,3 +652,38 @@ raw `scroll`/`resize` listeners anywhere outside GSAP's own ScrollTrigger, every
 `transform`/`opacity`/`clipPath` only (compositor-friendly, no layout thrashing) with `will-change` toggled on
 only while a ScrollTrigger is actually active, `backdrop-filter: blur()` is already gated to `≥1024px`, and
 product images already lazy-load with responsive AVIF/WebP/JPEG sources.
+
+## 16. Mobile fast-swipe "jumps to top" fix
+
+**Root cause: `styles/base.css` set `scroll-behavior: smooth` globally on `<html>`** (for everyone without
+`prefers-reduced-motion`). That property animates every scroll the browser considers "programmatic" — not just
+this app's own `scrollTo()`/`scrollIntoView()` calls, but native browser-triggered ones too (anchor-link
+navigation, keyboard/focus scrolling) — and a global smooth default fighting a fast native touch fling is a
+well-documented class of real-world "random jump to top" bug, especially around `position: sticky`/`fixed`
+elements (the Hero, the fixed header). This app's automated browser tooling runs with `prefers-reduced-motion:
+reduce` forced on, so this rule was never active in any of this project's own testing sessions — which is why
+nothing looked wrong before a real mobile browser hit it.
+
+**Fix:** removed the global rule (`styles/base.css`). Nothing else changed. The four places that deliberately
+want an animated scroll — `Gallery.jsx`'s arrow/dot navigation, `CategoryHero.jsx`'s "view the collection" link,
+`Checkout.jsx`'s step-change scroll-to-top, `scrollStages.js`'s `horizontalScroll` keyboard-focus scroll — all
+already pass `behavior: 'smooth'` directly to their own `scrollTo`/`scrollIntoView` call, which per spec
+overrides the CSS default regardless of its value, so none of them needed touching.
+
+**Ruled out** (audited, all correct, no changes made): every `scrollTo`/`scrollIntoView`/`scrollBy` call in the
+codebase is click/keyboard-triggered only, never scroll-driven; `PageTransition.jsx`'s route-change
+`scrollTo(0,0)` is gated to real `pathname`/`hash` changes and already explicitly `behavior: 'instant'`; no
+`pin: true` anywhere (the codebase deliberately uses `position: sticky` instead, specifically to avoid GSAP
+pin-spacer mobile jitter — see §3); `header.js`'s hide/show-on-scroll logic only reads scroll position and
+animates the header's own transform, never writes `window.scrollY`; both `IntersectionObserver`s in the app
+(`Gallery.jsx`, `useFilm.js`) are scoped to their own nested containers, not the page; `html`/`body`/`#root` are
+all `overflow: visible` (no nested scroll container); `scroll-snap-type` usage is horizontal-axis only, on
+contained carousels, with `overscroll-behavior-x: contain` already set; `ScrollTrigger.config({
+ignoreMobileResize: true })` already suppresses the mobile-address-bar-collapse resize/refresh churn.
+
+**Verification caveat:** this project's Browser-pane tooling cannot synthesize a genuine touch fling with real
+momentum physics (mobile viewport emulation translates gestures to mouse events, not touch-with-inertia), so the
+exact bug couldn't be reproduced pixel-for-pixel here. What was verified: `scroll-behavior` computes to `auto`
+post-fix; rapid synthetic scroll bursts are clean and monotonic with no reset; the Hero's scroll-scrubbed frame
+sequence, the fixed header's hide/show, and all four intentional `behavior: 'smooth'` interactions still work
+exactly as before; zero console errors; `npm run check` green.
