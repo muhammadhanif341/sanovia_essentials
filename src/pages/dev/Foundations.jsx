@@ -38,11 +38,11 @@ function Measured({ children, className, min = 4.5 }) {
 }
 
 const PALETTE = [
-  ['espresso-950', '#160D08'], ['espresso-900', '#1E120B'], ['espresso-800', '#2A1A11'], ['espresso-700', '#3A2417'],
-  ['walnut-600', '#5A3A28'], ['champagne-300', '#E2C99A'], ['champagne-400', '#C9A66B'], ['champagne-500', '#B08A4E'],
-  ['brass-700', '#7D5A22'], ['brass-800', '#654716'], ['ivory-50', '#F7F1E7'], ['cream-100', '#EDE3D3'],
-  ['sand-200', '#DCCDB5'], ['taupe-600', '#6B5A4A'], ['ink', '#1C120C'], ['plum-800', '#33223B'],
-  ['plum-700', '#4A3352'], ['burgundy-600', '#7A1F2B'], ['burgundy-300', '#D98A93'], ['mailer-300', '#C7D0D8'],
+  ['espresso-950', '#1C140E'], ['espresso-900', '#2B1E16'], ['espresso-800', '#30231B'], ['espresso-700', '#33261E'],
+  ['walnut-600', '#5A3E2C'], ['champagne-300', '#C19677'], ['champagne-400', '#BA8B6A'], ['champagne-500', '#B07A55'],
+  ['brass-700', '#7D573D'], ['brass-800', '#5F422F'], ['ivory-50', '#F3E9DC'], ['cream-100', '#E7DDD0'],
+  ['sand-200', '#D7CDC0'], ['taupe-600', '#695D54'], ['ink', '#19110D'], ['plum-800', '#221711'],
+  ['plum-700', '#32251D'], ['burgundy-600', '#7A1F2B'], ['burgundy-300', '#D98A93'], ['mailer-300', '#C7BCB0'],
 ];
 const SURFACES = ['dark', 'darker', 'raised', 'ivory', 'cream', 'plum'];
 
@@ -62,7 +62,7 @@ export function ColourSection() {
             <Overline>{s}</Overline>
             <Measured className="t-body">Body text on {s}</Measured>
             <Measured className="t-body t-muted">Muted text</Measured>
-            <Measured className="t-body t-accent">Accent text (gold / brass)</Measured>
+            <Measured className="t-body t-accent">Accent text (champagne / brass)</Measured>
           </div>
         ))}
       </div>
@@ -78,7 +78,7 @@ export function ColourSection() {
         ))}
       </div>
 
-      <Heading level={3} size="h3" className="sg-sub">Rule: gold on light</Heading>
+      <Heading level={3} size="h3" className="sg-sub">Rule: accent on light</Heading>
       <div className="sg-grid">
         <div data-surface="ivory" className="sg-surface">
           <Overline>Correct</Overline>
@@ -87,7 +87,7 @@ export function ColourSection() {
         <div className="sg-surface" style={{ background: 'var(--ivory-50)' }}>
           <Overline style={{ color: 'var(--ink)' }}>Wrong — never do this</Overline>
           <p className="t-body" style={{ color: 'var(--champagne-400)' }}>
-            Logo-gold text on ivory <span className="t-small">(2.04:1 ✗)</span>
+            Dark-surface accent text on ivory <span className="t-small">(2.49:1 ✗)</span>
           </p>
         </div>
       </div>

@@ -7,12 +7,12 @@
   position: fixed;
   inset: 0;
   z-index: var(--z-overlay);
-  background: rgb(22 13 8 / 0);
+  background: rgb(28 20 14 / 0);
   transition: background-color var(--dur-base) var(--ease-out);
   overscroll-behavior: contain;
 }
 .sv-dialog[data-state='open'] {
-  background: rgb(22 13 8 / 0.62);
+  background: rgb(28 20 14 / 0.62);
 }
 .sv-dialog__panel {
   position: absolute;

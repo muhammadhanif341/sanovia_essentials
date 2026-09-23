@@ -4,9 +4,9 @@ import { ArrowUpRight } from '@/components/icons';
 import './controls.css';
 
 /**
- * Inline / standalone text link. Gold by default (an accent — never used on light
- * surfaces at champagne; the token switches to brass there). `plain` inherits the
- * surrounding colour and draws its underline on hover instead.
+ * Inline / standalone text link. Accent brown by default (never used on light
+ * surfaces at the champagne tint; the token switches to brass there). `plain`
+ * inherits the surrounding colour and draws its underline on hover instead.
  * External links open in a new tab and say so to screen readers.
  */
 export function TextLink({ to, href, external, plain, className, children, ref, ...rest }) {

@@ -3,7 +3,7 @@
   position: sticky;
   top: var(--header-h);
   z-index: var(--z-sticky);
-  background: rgb(30 18 11 / 0.96);
+  background: rgb(43 30 22 / 0.96);
   border-bottom: 1px solid var(--hairline);
 }
 .sg-nav ul {
@@ -80,7 +80,7 @@
 }
 .sg-colcell {
   height: 3rem;
-  background: rgb(201 166 107 / 0.18);
+  background: rgb(176 122 85 / 0.18);
   border: 1px solid var(--hairline);
 }
 .sg-scroll {

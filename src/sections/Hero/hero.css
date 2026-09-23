@@ -78,9 +78,9 @@
    footage's cool black inside the espresso palette. */
 .sv-hero__shade {
   z-index: 1;
-  background: radial-gradient(120% 95% at 50% 46%, transparent 52%, rgb(12 7 4 / 0.55) 100%),
-    linear-gradient(to bottom, rgb(22 13 8 / 0.7) 0, rgb(22 13 8 / 0) 24%),
-    linear-gradient(to top, rgb(22 13 8 / 0.82) 0, rgb(22 13 8 / 0) 46%), rgb(74 42 22 / 0.1);
+  background: radial-gradient(120% 95% at 50% 46%, transparent 52%, rgb(12 8 6 / 0.55) 100%),
+    linear-gradient(to bottom, rgb(28 20 14 / 0.7) 0, rgb(28 20 14 / 0) 24%),
+    linear-gradient(to top, rgb(28 20 14 / 0.82) 0, rgb(28 20 14 / 0) 46%), rgb(176 122 85 / 0.1);
 }
 .sv-hero .sv-lamp {
   z-index: 1;

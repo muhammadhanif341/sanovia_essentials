@@ -3,36 +3,45 @@
    Single source of truth for colour, type, space, layout and motion.
    Derived from DESIGN-BLUEPRINT.md §2–4.
 
-   • Colours were read by eye from an Instagram screenshot. RE-SAMPLE from the
-     original logo / photography before launch.
+   • Brand palette is fixed and exact — a strict 60/30/10 system:
+       60% --espresso-900  #2b1e16  coffee brown (dominant surfaces)
+       30% --ivory-50      #f3e9dc  cream (secondary surfaces / text on dark)
+       10% --champagne-500 #b07a55  accent brown (CTAs, links, borders, icons)
+     Every other primitive below is a lighter/darker tint of one of these
+     three, mixed only as far as accessibility or hover/elevation states
+     require — see scripts/check-contrast.mjs. No other hue is introduced.
    • Contrast is enforced by `npm run check:contrast`, which parses THIS file.
      Change a colour here and that script tells you if a pairing now fails.
    • Components never use raw hex or primitives — only the semantic tokens
      (--surface, --fg, --accent …), which each [data-surface] redefines.
+   • The burgundy, error and success primitives are functional status colours
+     (urgency badge, form/payment validation) — deliberately kept outside the
+     brand ramp so they stay recognisable as "wrong"/"low stock"/"success"
+     rather than reading as another brand accent.
    ========================================================================== */
 
 :root {
   /* ---- Colour primitives ------------------------------------------------ */
-  --espresso-950: #160d08;
-  --espresso-900: #1e120b;
-  --espresso-800: #2a1a11;
-  --espresso-700: #3a2417; /* ≈ logo disc */
-  --walnut-600: #5a3a28;
-  --champagne-300: #e2c99a;
-  --champagne-400: #c9a66b; /* ≈ wordmark gold */
-  --champagne-500: #b08a4e;
-  --brass-700: #7d5a22; /* gold as TEXT on light */
-  --brass-800: #654716;
-  --ivory-50: #f7f1e7;
-  --cream-100: #ede3d3;
-  --sand-200: #dccdb5;
-  --taupe-600: #6b5a4a; /* muted text on light */
-  --ink: #1c120c;
-  --plum-800: #33223b;
-  --plum-700: #4a3352;
-  --burgundy-600: #7a1f2b;
+  --espresso-950: #1c140e; /* deepest curtain / overlay */
+  --espresso-900: #2b1e16; /* = brand coffee brown, exact */
+  --espresso-800: #30231b; /* raised dark surface */
+  --espresso-700: #33261e; /* raised-of-raised / warm edge */
+  --walnut-600: #5a3e2c; /* mid-brown media placeholder */
+  --champagne-300: #c19677; /* accent hover/focus text on dark */
+  --champagne-400: #ba8b6a; /* accent text-safe tint on dark (also primary btn on dark) */
+  --champagne-500: #b07a55; /* = brand accent brown, exact — borders/icons (non-text) */
+  --brass-700: #7d573d; /* accent as TEXT on light surfaces */
+  --brass-800: #5f422f; /* accent hover text on light surfaces */
+  --ivory-50: #f3e9dc; /* = brand cream, exact */
+  --cream-100: #e7ddd0; /* secondary light surface / card tint */
+  --sand-200: #d7cdc0; /* muted text on dark surfaces */
+  --taupe-600: #695d54; /* muted text on light surfaces */
+  --ink: #19110d; /* body text on light surfaces */
+  --plum-800: #221711; /* jewellery-editorial passage — coffee family, no purple */
+  --plum-700: #32251d;
+  --burgundy-600: #7a1f2b; /* status: "limited stock" badge — not a brand accent */
   --burgundy-300: #d98a93;
-  --mailer-300: #c7d0d8; /* cool neutral — packing story only */
+  --mailer-300: #c7bcb0; /* warm neutral — packing story only */
   --error-dark: #e58a7a;
   --error-light: #a32e22;
   --success-dark: #9dbb8a;
@@ -166,20 +175,20 @@
   --surface-raised: var(--espresso-800);
   --fg: var(--ivory-50);
   --fg-muted: var(--sand-200);
-  --accent: var(--champagne-400); /* gold usable as text */
+  --accent: var(--champagne-400); /* accent brown, usable as text */
   --accent-strong: var(--champagne-300);
-  --accent-ui: var(--champagne-500); /* gold for borders / icons (non-text) */
-  --hairline: rgb(201 166 107 / 0.24);
-  --hairline-strong: rgb(201 166 107 / 0.5);
+  --accent-ui: var(--champagne-500); /* accent brown for borders / icons (non-text) */
+  --hairline: rgb(176 122 85 / 0.24);
+  --hairline-strong: rgb(176 122 85 / 0.5);
   --focus: var(--champagne-300);
   --btn-bg: var(--champagne-400);
   --btn-fg: var(--espresso-900);
   --btn-bg-hover: var(--champagne-300);
-  --field-bg: rgb(247 241 231 / 0.04);
+  --field-bg: rgb(243 233 220 / 0.04);
   --field-border: var(--champagne-500);
   --danger: var(--error-dark);
   --success: var(--success-dark);
-  --scrim: rgb(22 13 8 / 0.78);
+  --scrim: rgb(28 20 14 / 0.78);
   color-scheme: dark;
 }
 [data-surface='darker'] {
@@ -191,7 +200,7 @@
   --surface-raised: var(--espresso-700);
 }
 
-/* Light family: ivory + cream. Gold text uses brass, never champagne (2.04:1). */
+/* Light family: ivory + cream. Accent text uses brass, never champagne (2.5:1). */
 [data-surface='ivory'],
 [data-surface='cream'] {
   --surface: var(--ivory-50);
@@ -211,7 +220,7 @@
   --field-border: var(--brass-700);
   --danger: var(--error-light);
   --success: var(--success-light);
-  --scrim: rgb(247 241 231 / 0.86);
+  --scrim: rgb(243 233 220 / 0.86);
   color-scheme: light;
 }
 [data-surface='cream'] {
@@ -219,7 +228,9 @@
   --surface-raised: var(--ivory-50);
 }
 
-/* Plum: the jewellery-editorial passage. */
+/* Plum: the jewellery-editorial passage — recoloured into the coffee-brown family
+   (was a purple; the brand palette has no purple), kept as its own surface purely so
+   this passage still reads as a distinct, slightly deeper stop from the default dark. */
 [data-surface='plum'] {
   --surface: var(--plum-800);
   --surface-raised: var(--plum-700);
@@ -228,16 +239,16 @@
   --accent: var(--champagne-400);
   --accent-strong: var(--champagne-300);
   --accent-ui: var(--champagne-500);
-  --hairline: rgb(201 166 107 / 0.28);
-  --hairline-strong: rgb(201 166 107 / 0.55);
+  --hairline: rgb(176 122 85 / 0.28);
+  --hairline-strong: rgb(176 122 85 / 0.55);
   --focus: var(--champagne-300);
   --btn-bg: var(--champagne-400);
   --btn-fg: var(--espresso-900);
   --btn-bg-hover: var(--champagne-300);
-  --field-bg: rgb(247 241 231 / 0.05);
+  --field-bg: rgb(243 233 220 / 0.05);
   --field-border: var(--champagne-500);
   --danger: var(--error-dark);
   --success: var(--success-dark);
-  --scrim: rgb(28 18 34 / 0.8);
+  --scrim: rgb(28 20 14 / 0.8);
   color-scheme: dark;
 }

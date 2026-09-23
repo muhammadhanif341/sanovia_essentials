@@ -85,13 +85,13 @@
   pointer-events: none;
 }
 .sv-media__scrim[data-scrim='bottom'] {
-  background: linear-gradient(to top, rgb(22 13 8 / 0.82), rgb(22 13 8 / 0) 58%);
+  background: linear-gradient(to top, rgb(28 20 14 / 0.82), rgb(28 20 14 / 0) 58%);
 }
 .sv-media__scrim[data-scrim='top'] {
-  background: linear-gradient(to bottom, rgb(22 13 8 / 0.82), rgb(22 13 8 / 0) 58%);
+  background: linear-gradient(to bottom, rgb(28 20 14 / 0.82), rgb(28 20 14 / 0) 58%);
 }
 .sv-media__scrim[data-scrim='full'] {
-  background: rgb(22 13 8 / 0.5);
+  background: rgb(28 20 14 / 0.5);
 }
 
 /* ---- Placeholder: tonal block + "shot needed" label ------------------------ */
@@ -154,7 +154,7 @@
   height: var(--logo-size, 2.5rem);
   border-radius: 50%;
   background: var(--espresso-700);
-  box-shadow: inset 0 0 0 1px rgb(201 166 107 / 0.45);
+  box-shadow: inset 0 0 0 1px rgb(176 122 85 / 0.45);
   color: var(--champagne-400);
   font: 500 calc(var(--logo-size, 2.5rem) * 0.52) / 1 var(--font-display);
 }
@@ -202,7 +202,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgb(22 13 8 / 0.55);
+  background: rgb(28 20 14 / 0.55);
   color: var(--fg);
   border: 1px solid var(--hairline-strong);
   cursor: pointer;
