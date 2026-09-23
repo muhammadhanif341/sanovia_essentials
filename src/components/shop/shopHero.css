@@ -1,0 +1,34 @@
+/* Category hero (Watches/Jewellery). `pad="flush"` on the Section + explicit padding here
+   (instead of the default --section-pad) is deliberate: two stacked Sections each carrying
+   full padding is exactly the "dead space" the redesign brief called out. */
+.sv-cat-hero {
+  padding-top: clamp(2.5rem, 6vw, 4.5rem);
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+.sv-cat-hero__grid {
+  align-items: center;
+  row-gap: var(--space-7);
+}
+.sv-cat-hero--jewellery .sv-cat-hero__grid {
+  align-items: start;
+}
+.sv-cat-hero__copy {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+}
+.sv-cat-hero__media {
+  position: relative;
+}
+@media (min-width: 1024px) {
+  .sv-cat-hero__media--b {
+    z-index: 2;
+    margin-top: var(--space-9);
+  }
+  .sv-cat-hero__media--a {
+    margin-top: var(--space-5);
+  }
+}
+.sv-cat-hero__meta {
+  color: var(--fg-muted);
+}

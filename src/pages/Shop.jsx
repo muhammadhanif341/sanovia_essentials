@@ -6,10 +6,11 @@ import { ProductGrid } from '@/components/product/ProductGrid';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Typography';
 import { RollLink } from '@/components/layout/RollLink';
-import { SelectField, TextField, CheckboxField } from '@/components/ui/Field';
+import { SelectField } from '@/components/ui/Field';
 import { Search, Sliders } from '@/components/icons';
+import { CategoryHero } from '@/components/shop/CategoryHero';
+import { FilterDrawer } from '@/components/shop/FilterDrawer';
 import { getProductsByCategory, SHOP_VIEWS } from '@/services/productRepository';
-import { site } from '@/data/site';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePageMotion } from '@/hooks/useSectionMotion';
 import './shop.css';
@@ -71,6 +72,7 @@ export default function Shop() {
   const hideUnavailable = params.get('avail') === '1';
   const minPrice = params.get('min') ?? '';
   const maxPrice = params.get('max') ?? '';
+  const selectedTypes = useMemo(() => params.get('type')?.split(',').filter(Boolean) ?? [], [params]);
 
   const [queryInput, setQueryInput] = useState(query);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -98,11 +100,20 @@ export default function Shop() {
 
   const base = view ? view.get() : getProductsByCategory(category);
 
+  const typeOptions = useMemo(
+    () => [...new Set(base.map((p) => p.subcategory).filter(Boolean))].sort(),
+    [base]
+  );
+  const typeLabel = category === 'jewellery' ? 'Type' : 'Collection';
+
   const filtered = useMemo(() => {
     let list = base;
     if (query) {
       const q = query.toLowerCase();
       list = list.filter((p) => `${p.name} ${p.category}`.toLowerCase().includes(q));
+    }
+    if (selectedTypes.length) {
+      list = list.filter((p) => p.subcategory && selectedTypes.includes(p.subcategory));
     }
     if (hideUnavailable) {
       list = list.filter((p) => p.availability !== 'out-of-stock' && p.availability !== 'coming-soon');
@@ -113,7 +124,7 @@ export default function Shop() {
       list = list.filter((p) => p.price == null || ((min == null || p.price >= min) && (max == null || p.price <= max)));
     }
     return sortProducts(list, sort);
-  }, [base, query, hideUnavailable, minPrice, maxPrice, sort]);
+  }, [base, query, selectedTypes, hideUnavailable, minPrice, maxPrice, sort]);
 
   useDocumentTitle(query ? 'Search' : title, query ? undefined : `Shop ${title.toLowerCase()} at Sanovia Essentials — minimal everyday watches and jewellery.`);
 
@@ -128,11 +139,27 @@ export default function Shop() {
       { replace: true }
     );
 
-  const activeFilterCount = (hideUnavailable ? 1 : 0) + (minPrice ? 1 : 0) + (maxPrice ? 1 : 0);
+  const toggleType = (value) => {
+    const next = selectedTypes.includes(value) ? selectedTypes.filter((v) => v !== value) : [...selectedTypes, value];
+    setParam('type', next.join(','));
+  };
+
+  const clearFilters = () =>
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        ['type', 'avail', 'min', 'max'].forEach((k) => next.delete(k));
+        return next;
+      },
+      { replace: true }
+    );
+
+  const activeFilterCount = selectedTypes.length + (hideUnavailable ? 1 : 0) + (minPrice ? 1 : 0) + (maxPrice ? 1 : 0);
+  const showCategoryHero = (category === 'watches' || category === 'jewellery') && !query;
 
   return (
     <div ref={ref}>
-      <PageHead overline="Shop" title={title} />
+      {showCategoryHero ? <CategoryHero category={category} count={base.length} /> : <PageHead overline="Shop" title={title} />}
       <Section surface="dark" pad="tight">
         <Container>
           <div className="sv-shop-toolbar">
@@ -168,51 +195,39 @@ export default function Shop() {
                 variant="ghost"
                 size="sm"
                 iconBefore={<Sliders size={16} />}
-                aria-expanded={filtersOpen}
-                aria-controls="sv-shop-filters"
-                onClick={() => setFiltersOpen((o) => !o)}
+                aria-haspopup="dialog"
+                onClick={() => setFiltersOpen(true)}
               >
                 Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
               </Button>
             </div>
           </div>
 
-          {filtersOpen && (
-            <div id="sv-shop-filters" className="sv-shop-filters">
-              <CheckboxField
-                label="Hide out-of-stock & coming soon"
-                checked={hideUnavailable}
-                onChange={(e) => setParam('avail', e.target.checked ? '1' : '')}
-              />
-              {site.showPrices && (
-                <div className="sv-shop-filters__price">
-                  <TextField
-                    label={`Min price (${site.currency})`}
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    value={minPrice}
-                    onChange={(e) => setParam('min', e.target.value)}
-                  />
-                  <TextField
-                    label={`Max price (${site.currency})`}
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    value={maxPrice}
-                    onChange={(e) => setParam('max', e.target.value)}
-                  />
-                </div>
-              )}
-            </div>
-          )}
+          <FilterDrawer
+            open={filtersOpen}
+            onClose={() => setFiltersOpen(false)}
+            typeLabel={typeLabel}
+            typeOptions={typeOptions}
+            selectedTypes={selectedTypes}
+            onToggleType={toggleType}
+            hideUnavailable={hideUnavailable}
+            onToggleAvailability={(checked) => setParam('avail', checked ? '1' : '')}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onMinPriceChange={(v) => setParam('min', v)}
+            onMaxPriceChange={(v) => setParam('max', v)}
+            onClear={clearFilters}
+            resultCount={filtered.length}
+          />
 
           <p className="sv-shop-count t-small t-muted" aria-live="polite">
             {filtered.length} {filtered.length === 1 ? 'piece' : 'pieces'}
           </p>
 
           {filtered.length ? (
-            <ProductGrid products={filtered} label={title} feature />
+            <div id="sv-shop-grid">
+              <ProductGrid products={filtered} label={title} />
+            </div>
           ) : (
             <div className="sv-empty">
               <Text size="body-l">

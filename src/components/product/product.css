@@ -107,7 +107,11 @@
 }
 .sv-pcard__body {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  /* minmax floor, not a bare 1fr: a long name beside a struck-through compare price (both
+     "auto" siblings) could otherwise squeeze the title track to a few px and force it to
+     wrap mid-word — reproducible on "Tonneau Signature Watch" in a balanced (non-featured)
+     grid column. */
+  grid-template-columns: auto minmax(5rem, 1fr) auto;
   align-items: baseline;
   column-gap: var(--space-3);
 }
