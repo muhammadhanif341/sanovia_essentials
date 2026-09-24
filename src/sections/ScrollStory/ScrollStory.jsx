@@ -1,9 +1,16 @@
+import { lazy, Suspense, useState } from 'react';
 import { Container } from '@/components/layout/primitives';
 import { Button } from '@/components/ui/Button';
 import { StickyStage } from '@/components/motion/StickyStage';
 import { ArrowRight } from '@/components/icons';
 import { scrollStoryBuild } from '@/animations';
+import { cn } from '@/utils/cn';
 import './scrollStory.css';
+
+// Code-split: three.js + fiber + drei are real weight, so the "Chosen" frame's 3D model
+// loads as its own chunk, fetched only once ScrollStory actually mounts — never blocking
+// the rest of Home's JS. See components/three/ChosenModel.jsx for the model itself.
+const ChosenModel = lazy(() => import('@/components/three/ChosenModel'));
 
 const FRAMES = [
   { n: '01', title: 'Chosen', body: 'Each piece is chosen before it is listed — not mass-produced, not guessed at.' },
@@ -22,6 +29,7 @@ const FRAMES = [
  * same four frames simply stack as ordinary sections — the story is complete without the pin.
  */
 export function ScrollStory() {
+  const [chosenFrame, setChosenFrame] = useState(null);
   return (
     <StickyStage
       steps={FRAMES.length}
@@ -32,7 +40,17 @@ export function ScrollStory() {
       aria-label="How a Sanovia order comes together"
     >
       {FRAMES.map((f) => (
-        <div key={f.n} className="story__frame" data-story-frame>
+        <div
+          key={f.n}
+          className={cn('story__frame', f.n === '01' && 'story__frame--model')}
+          data-story-frame
+          ref={f.n === '01' ? setChosenFrame : undefined}
+        >
+          {f.n === '01' && (
+            <Suspense fallback={null}>
+              <ChosenModel frameEl={chosenFrame} />
+            </Suspense>
+          )}
           <Container size="narrow">
             <div className="story__inner">
               <span className="t-numeral story__numeral" aria-hidden="true">

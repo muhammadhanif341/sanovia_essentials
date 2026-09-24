@@ -48,3 +48,10 @@
 .story__cta {
   margin-top: var(--space-3);
 }
+
+/* "Chosen" frame only: the 3D model sits behind this text (see ChosenModel.jsx) and needs
+   drag/touch to reach it everywhere in its bounds, including where the (non-interactive —
+   this frame has no links/buttons) text visually overlaps it. */
+.story__frame--model .story__inner {
+  pointer-events: none;
+}
