@@ -1,0 +1,25 @@
+/* In-flow, centred 3D viewport — a normal child of .story__inner's centred grid stack
+   (heading, then this, per the client's requested order), not an absolute background layer.
+   Sized moderately rather than full-bleed: OrbitControls needs touch-action: none on the
+   canvas for 2-axis drag, and a bounded box (not the whole frame) leaves scrollable margin
+   around it so a mobile swipe that was meant to scroll the page is never trapped — the exact
+   class of bug already fixed once in this project (see docs/ARCHITECTURE.md, "Mobile
+   fast-swipe jumps to top"). Also kept modest because the pinned StickyStage frame this lives
+   in has a FIXED height while active (100svh, not min-height) — it needs to fit alongside the
+   overline/heading above it without clipping. */
+.story__model {
+  width: min(52vw, 21rem);
+  height: min(52vw, 21rem);
+  max-height: 36vh;
+}
+.story__model canvas {
+  touch-action: none;
+  outline: none;
+}
+@media (max-width: 767.98px) {
+  .story__model {
+    width: min(70vw, 14rem);
+    height: min(70vw, 14rem);
+    max-height: 26vh;
+  }
+}

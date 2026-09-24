@@ -103,4 +103,7 @@ they match playback exactly.
 ## Static, unhashed files → `public/`
 
 Only things that need a stable URL: `favicon.svg`, `robots.txt`, `og-image.jpg`, `manifest`. Do not put
-photography in `public/`.
+photography in `public/` — but `public/models/*.glb` is the right place for 3D assets loaded by URL through
+three.js's `GLTFLoader` (drei's `useGLTF`), since those never go through the `import.meta.glob` picture
+registry above. See `docs/ARCHITECTURE.md` §18. Compress with `@gltf-transform/cli optimize` before committing
+a new one — the one there today went from 10.9 MB to 2.2 MB with no visible quality loss.

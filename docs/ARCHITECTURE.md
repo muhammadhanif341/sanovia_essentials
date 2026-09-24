@@ -743,3 +743,86 @@ true desktop (1280px) width: `/about`, `/drops/01`, `/drops/02` (empty-drop stat
 Showcase + Social strip), `/shop/jewellery`. Zero console errors on any route. No product/category/search/filter
 logic touched — this pass only added content and 5 image references, all resolved through the existing
 `utils/media.js` registry with no code changes to it.
+
+## 18. A real 3D model in the "Chosen" step of ScrollStory
+
+The client's brief: put a real `.glb` (not a render, not an image) at the centre of the "Chosen" step —
+`sections/ScrollStory/ScrollStory.jsx`, frame `01` (`FRAMES[0]`, the pinned narrative's first beat) — draggable
+on desktop and touch, with a slow idle spin that yields to interaction.
+
+**Stack (new dependency):** `three` (0.186), `@react-three/fiber` (9.8, requires React `>=19 <19.4` — this
+project is on 19.3, compatible) and `@react-three/drei` (10.7). None of this touches GSAP/ScrollTrigger, which
+still owns every other animation in the app — the 3D canvas runs its own independent render loop, deliberately
+outside `useMotion`'s matchMedia/revert system (see the file's own doc comment on why).
+
+**New files:**
+- `components/three/ChosenModel.jsx` + `chosenModel.css` — the R3F scene: lighting, camera-fit, drag/idle
+  rotation, and the visibility-pausing logic below. Default-exported so `ScrollStory.jsx` can `React.lazy()` it.
+- `public/models/chosen-piece.glb` — the client-supplied model, run through `@gltf-transform/cli optimize`
+  (meshopt compression + WebP texture recompression + weld/simplify/prune) before shipping:
+  **10.87 MB → 2.22 MB** (79.6% smaller), vertex count 201k → 136k via weld (duplicate-vertex removal, not a
+  visible quality loss at this piece's silhouette complexity). drei's `useGLTF` already wires up
+  `MeshoptDecoder` internally — no extra loader config needed for the compressed format.
+
+**Why `public/` and not `src/assets/` (see `src/assets/README.md`'s own "no photography in public/" rule):**
+that rule is about photography needing the `import.meta.glob` registry's responsive `<picture>` machinery. A
+`.glb` is fetched directly by three.js's `GLTFLoader` via a plain URL string, never through that registry —
+`public/` (a stable, unhashed path) is the standard, zero-config way to serve a binary 3D asset with Vite.
+
+**Placement/interaction (`chosenModel.css`):** deliberately a bounded, centred box (`min(78vw, 30rem)`, capped
+`58vh`), not `inset: 0` full-bleed. `OrbitControls` needs `touch-action: none` on the canvas to get full 2-axis
+drag rotation on touch — sizing it to fill the *entire* frame would mean a mobile swipe anywhere in that 70vh
+section gets captured for rotation instead of scrolling the page, which is exactly the bug already fixed once
+in this project (§16, the fast-swipe-jumps-to-top fix). A moderate, clearly-bounded viewport is the standard
+compromise every embedded-3D-viewer pattern on the web uses, and leaves generous scrollable margin around it.
+
+**Text-over-model pointer conflict (found and fixed during testing):** the "Chosen" frame's heading/body text
+sits centred on top of the model by design (same composition as the numeral watermark behind it). Text is
+`pointer-events: auto` by default, so a drag starting on a glyph selected text instead of reaching the canvas
+underneath — confirmed by testing, not assumed. Fixed with one new scoped rule,
+`.story__frame--model .story__inner { pointer-events: none; }` — safe *only* because this specific frame has
+zero interactive elements (no links/buttons; those only exist on frame `04`, which the modifier class doesn't
+touch). No visible styling changed, purely a hit-testing fix.
+
+**Idle spin vs. interaction:** `OrbitControls`' `onStart`/`onEnd` toggle a `dragging` state; the idle
+`rotation.y += delta * 0.12` (slow — one full turn every ~52s) only runs when `!dragging && !reduce`. On
+`onEnd`, idle spin resumes 2.2s after release rather than snapping back instantly — interaction always wins
+while it's happening, per the brief.
+
+**Reduced motion:** gated on the project's existing `prefersReducedMotion()` (`animations/media.js`), read once
+on mount — same non-reactive convention already used elsewhere (`useSectionMotion.js`'s `parallaxIntensity()`).
+Reduced motion disables only the idle spin; drag/touch rotation stays available (it's user-initiated, not
+autoplaying motion).
+
+**Not wasting cycles when hidden (`useFrameActive` in ChosenModel.jsx):** the Canvas's `frameloop` prop toggles
+`'always'`/`'never'` based on two signals combined: (1) an `IntersectionObserver` on the frame element — the
+scrolled-off-screen case (mobile/reduced-motion, where ScrollStory's four frames simply stack as ordinary
+sections); (2) a `MutationObserver` watching the frame's `style` attribute for `visibility: hidden` — the
+**pinned** case, where `stickyStage()`'s own doc comment (`animations/primitives/scrollStages.js`) explicitly
+says frames "should be stills crossfading… not video/canvas scrubbing," because all 4 frames sit
+`position: absolute; inset: 0` on top of each other and GSAP's `autoAlpha` toggles `visibility`/`opacity`, not
+`display` — a plain IntersectionObserver alone can't see that, since all 4 frames geometrically overlap the
+same pinned viewport the whole time. `frameloop: 'never'` stops the actual rAF loop (not just a visual hide),
+so the crossfaded-away 3D canvas costs nothing during frames 02–04.
+
+**Disposal:** R3F's `<Canvas>` disposes its WebGL context, geometries and materials automatically on unmount —
+nothing manual needed; `useGLTF`'s cache is left alone deliberately (per-URL caching is the intended behavior
+for a model that could in principle be reused elsewhere later).
+
+**Bundle impact:** the three.js/fiber/drei/RoomEnvironment stack is real weight — `ChosenModel` is its own
+lazy-loaded chunk (`React.lazy()` in `ScrollStory.jsx`), **~287 KB gzipped**, fetched only once `ScrollStory`
+mounts and never bundled into the main entry chunk. The `.glb` itself (2.2 MB) loads separately again behind
+that, via `useGLTF.preload()`.
+
+**Verified:** `npm run check` green. In-browser: model loads (200 from `/models/chosen-piece.glb`), renders
+centred with visible lighting/reflections, drag-to-rotate confirmed working on both a ~1280px desktop width and
+a 390px mobile width (visibly different silhouette after a drag, in both cases — see screenshots taken during
+this session), no horizontal overflow at 390px (`scrollWidth === innerWidth`), page scroll still works normally
+around the model, zero console errors after the fix above. **Not verifiable in this environment:** this
+project's browser-pane tooling forces `prefers-reduced-motion: reduce` (a known, previously-documented
+limitation — see §7/§16), which also gates the pinned `StickyStage` itself
+(`animations/media.js`'s `tabletUp`/`full` conditions require `no-preference`) — so the PINNED crossfade mode,
+and therefore the `MutationObserver`-driven pause specifically, could not be visually exercised here, only
+confirmed correct by reading `stickyStage()`'s actual GSAP calls (`gsap.set(frames, {autoAlpha: 0})`) against
+what `useFrameActive` watches for. The idle-spin animation itself is similarly unverifiable visually here for
+the same forced-reduced-motion reason — confirmed instead by reading the gating logic (`!reduce && !dragging`).
