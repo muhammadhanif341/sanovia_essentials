@@ -21,7 +21,7 @@ export function JewelleryEditorial() {
     <Section surface="plum" aria-labelledby="jewellery-title">
       <Container>
         <Grid className="jewel__grid">
-          <GridItem span={{ base: 4, md: 8, lg: 6 }} className="jewel__copy">
+          <GridItem span={{ base: 4, md: 8, lg: 6 }} row={{ lg: 1 }} className="jewel__copy">
             <Overline accent data-reveal="fade">
               Jewellery
             </Overline>
@@ -37,7 +37,7 @@ export function JewelleryEditorial() {
             </div>
           </GridItem>
 
-          <GridItem span={{ base: 4, md: 4, lg: 3 }} start={{ lg: 8 }} className="jewel__media jewel__media--a">
+          <GridItem span={{ base: 4, md: 4, lg: 3 }} start={{ lg: 8 }} row={{ lg: 1 }} className="jewel__media jewel__media--a">
             <ShapeMedia
               id={first.images?.primary}
               shape="oval"
@@ -49,7 +49,7 @@ export function JewelleryEditorial() {
               alt={first.name}
             />
           </GridItem>
-          <GridItem span={{ base: 4, md: 4, lg: 3 }} start={{ lg: 10 }} className="jewel__media jewel__media--b">
+          <GridItem span={{ base: 4, md: 4, lg: 3 }} start={{ lg: 10 }} row={{ lg: 1 }} className="jewel__media jewel__media--b">
             <ShapeMedia
               id={second.images?.primary}
               shape="arch"
