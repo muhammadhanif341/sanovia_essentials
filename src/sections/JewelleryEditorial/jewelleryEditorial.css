@@ -1,6 +1,7 @@
 /* Jewellery Editorial — copy sits in a wide column with a full track of negative space
-   beside it; the two photos overlap by one grid track on desktop (a deliberate layered
-   composition, not a rendering accident) with the second lifted forward and down. */
+   beside it; the two photos sit side by side on desktop with no shared grid column (an
+   earlier version deliberately overlapped them by one track — removed per client
+   feedback), the second offset lower for a staggered, not-perfectly-aligned rhythm. */
 
 .jewel__grid {
   align-items: start;

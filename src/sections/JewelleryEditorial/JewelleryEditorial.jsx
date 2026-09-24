@@ -37,7 +37,7 @@ export function JewelleryEditorial() {
             </div>
           </GridItem>
 
-          <GridItem span={{ base: 4, md: 4, lg: 3 }} start={{ lg: 8 }} row={{ lg: 1 }} className="jewel__media jewel__media--a">
+          <GridItem span={{ base: 4, md: 4, lg: 3 }} start={{ lg: 7 }} row={{ lg: 1 }} className="jewel__media jewel__media--a">
             <ShapeMedia
               id={first.images?.primary}
               shape="oval"
