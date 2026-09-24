@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/Button';
 import { StickyStage } from '@/components/motion/StickyStage';
 import { ArrowRight } from '@/components/icons';
 import { scrollStoryBuild } from '@/animations';
-import { cn } from '@/utils/cn';
 import './scrollStory.css';
 
 // Code-split: three.js + fiber + drei are real weight, so the "Chosen" frame's 3D model
@@ -13,7 +12,8 @@ import './scrollStory.css';
 const ChosenModel = lazy(() => import('@/components/three/ChosenModel'));
 
 const FRAMES = [
-  { n: '01', title: 'Chosen', body: 'Each piece is chosen before it is listed — not mass-produced, not guessed at.' },
+  // No body copy — the model sits directly under the heading instead (client request).
+  { n: '01', title: 'Chosen' },
   {
     n: '02',
     title: 'Wrapped',
@@ -40,17 +40,7 @@ export function ScrollStory() {
       aria-label="How a Sanovia order comes together"
     >
       {FRAMES.map((f) => (
-        <div
-          key={f.n}
-          className={cn('story__frame', f.n === '01' && 'story__frame--model')}
-          data-story-frame
-          ref={f.n === '01' ? setChosenFrame : undefined}
-        >
-          {f.n === '01' && (
-            <Suspense fallback={null}>
-              <ChosenModel frameEl={chosenFrame} />
-            </Suspense>
-          )}
+        <div key={f.n} className="story__frame" data-story-frame ref={f.n === '01' ? setChosenFrame : undefined}>
           <Container size="narrow">
             <div className="story__inner">
               <span className="t-numeral story__numeral" aria-hidden="true">
@@ -58,7 +48,12 @@ export function ScrollStory() {
               </span>
               <p className="t-overline t-accent">{f.n}</p>
               <h2 className="t-display-l">{f.title}.</h2>
-              <p className="t-body-l t-muted story__body">{f.body}</p>
+              {f.n === '01' && (
+                <Suspense fallback={null}>
+                  <ChosenModel frameEl={chosenFrame} />
+                </Suspense>
+              )}
+              {f.body && <p className="t-body-l t-muted story__body">{f.body}</p>}
               {f.cta && (
                 <div className="story__cta">
                   <Button to="/shop" iconAfter={<ArrowRight size={18} />}>

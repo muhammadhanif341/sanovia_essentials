@@ -1,28 +1,25 @@
-/* Centred, bounded 3D viewport — deliberately NOT full-bleed inset:0. A moderate, capped box
-   leaves scrollable margin around it within the frame so the canvas capturing touch drag for
-   rotation (touch-action: none, required for 2-axis OrbitControls drag) never traps a mobile
-   swipe that was meant to scroll the page — the exact class of bug already fixed once in this
-   project (see docs/ARCHITECTURE.md, "Mobile fast-swipe jumps to top"). */
+/* In-flow, centred 3D viewport — a normal child of .story__inner's centred grid stack
+   (heading, then this, per the client's requested order), not an absolute background layer.
+   Sized moderately rather than full-bleed: OrbitControls needs touch-action: none on the
+   canvas for 2-axis drag, and a bounded box (not the whole frame) leaves scrollable margin
+   around it so a mobile swipe that was meant to scroll the page is never trapped — the exact
+   class of bug already fixed once in this project (see docs/ARCHITECTURE.md, "Mobile
+   fast-swipe jumps to top"). Also kept modest because the pinned StickyStage frame this lives
+   in has a FIXED height while active (100svh, not min-height) — it needs to fit alongside the
+   overline/heading above it without clipping. */
 .story__model {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(78vw, 30rem);
-  height: min(78vw, 30rem);
-  max-height: 58vh;
-  z-index: 0; /* behind .story__inner's text (default stacking, painted after in DOM order) */
-  pointer-events: none;
+  width: min(52vw, 21rem);
+  height: min(52vw, 21rem);
+  max-height: 36vh;
 }
 .story__model canvas {
   touch-action: none;
-  pointer-events: auto;
   outline: none;
 }
 @media (max-width: 767.98px) {
   .story__model {
-    width: min(82vw, 20rem);
-    height: min(82vw, 20rem);
-    max-height: 42vh;
+    width: min(70vw, 14rem);
+    height: min(70vw, 14rem);
+    max-height: 26vh;
   }
 }
