@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { StickyStage } from '@/components/motion/StickyStage';
 import { ArrowRight } from '@/components/icons';
 import { scrollStoryBuild } from '@/animations';
+import { cn } from '@/utils/cn';
 import './scrollStory.css';
 
 // Code-split: three.js + fiber + drei are real weight, so the "Chosen" frame's 3D model
@@ -40,7 +41,12 @@ export function ScrollStory() {
       aria-label="How a Sanovia order comes together"
     >
       {FRAMES.map((f) => (
-        <div key={f.n} className="story__frame" data-story-frame ref={f.n === '01' ? setChosenFrame : undefined}>
+        <div
+          key={f.n}
+          className={cn('story__frame', f.n === '01' && 'story__frame--chosen')}
+          data-story-frame
+          ref={f.n === '01' ? setChosenFrame : undefined}
+        >
           <Container size="narrow">
             <div className="story__inner">
               <span className="t-numeral story__numeral" aria-hidden="true">

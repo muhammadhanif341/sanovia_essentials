@@ -26,6 +26,14 @@
   min-height: 0;
   padding-block: 0;
 }
+/* "Chosen" has no body paragraph (the model sits under the heading instead — see
+   ScrollStory.jsx), so it reads as too much empty space at the other frames' 70vh/space-8.
+   Only applies when NOT pinned; the active/pinned state above already forces min-height:0. */
+.story__frame--chosen {
+  min-height: 52vh;
+  min-height: 52svh;
+  padding-block: var(--space-6);
+}
 
 .story__inner {
   position: relative;
